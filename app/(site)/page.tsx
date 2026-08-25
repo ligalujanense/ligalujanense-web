@@ -19,40 +19,42 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col">
-      <section className="relative bg-gradient-to-b from-dorado-oscuro via-dorado to-dorado-claro overflow-hidden">
+      <section className="relative bg-gradient-to-b from-crema via-dorado-claro/25 to-dorado/20 overflow-hidden">
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-40"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 15% 25%, #1E6FA0 0, transparent 40%), radial-gradient(circle at 85% 75%, #1E6FA0 0, transparent 35%)",
+              "radial-gradient(circle at 12% 15%, #E8BE6B 0, transparent 45%), radial-gradient(circle at 90% 85%, #D9A441 0, transparent 40%)",
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-4 py-14 sm:py-20 text-center flex flex-col items-center gap-4">
-          <div className="bg-white rounded-full p-4 shadow-xl ring-4 ring-white/40">
-            <Image src="/logo.png" alt="Liga Lujanense" width={96} height={106} className="h-20 w-auto" priority />
-          </div>
-          <span className="uppercase tracking-[0.2em] text-celeste-oscuro/80 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
-            Temporada 2026
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight drop-shadow-sm">
-            Liga Lujanense de Fútbol
-          </h1>
-          <p className="text-white/90 max-w-xl font-medium">
-            Noticias, fixture, tabla de posiciones y clubes afiliados de la liga.
-          </p>
-          <div className="flex flex-wrap gap-3 justify-center mt-2">
-            <Link
-              href="/posiciones"
-              className="bg-celeste-oscuro hover:bg-celeste text-white font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
-            >
-              Ver posiciones
-            </Link>
-            <Link
-              href="/fixture"
-              className="bg-white hover:bg-white/90 text-dorado-oscuro font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
-            >
-              Ver fixture
-            </Link>
+        <div className="relative max-w-2xl mx-auto px-4 py-14 sm:py-20">
+          <div className="bg-celeste-oscuro rounded-3xl px-8 py-12 shadow-2xl flex flex-col items-center gap-4 text-center">
+            <div className="bg-white rounded-full p-4 shadow-lg">
+              <Image src="/logo.png" alt="Liga Lujanense" width={96} height={106} className="h-20 w-auto" priority />
+            </div>
+            <span className="uppercase tracking-[0.2em] text-dorado-claro text-xs font-bold bg-white/10 px-3 py-1 rounded-full">
+              Temporada 2026
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              Liga Lujanense de Fútbol
+            </h1>
+            <p className="text-white/80 max-w-xl font-medium">
+              Noticias, fixture, tabla de posiciones y clubes afiliados de la liga.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center mt-2">
+              <Link
+                href="/posiciones"
+                className="bg-dorado hover:bg-dorado-claro text-celeste-oscuro font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                Ver posiciones
+              </Link>
+              <Link
+                href="/fixture"
+                className="bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-2.5 rounded-full transition-colors border border-white/20"
+              >
+                Ver fixture
+              </Link>
+            </div>
           </div>
         </div>
       </section>
