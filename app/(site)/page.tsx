@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
@@ -18,34 +19,35 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col">
-      <section className="relative bg-marino-oscuro overflow-hidden">
+      <section className="relative bg-gradient-to-b from-dorado-oscuro via-dorado to-dorado-claro overflow-hidden">
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 20% 20%, #D9A441 0, transparent 45%), radial-gradient(circle at 80% 60%, #123B6B 0, transparent 50%)",
+              "radial-gradient(circle at 15% 25%, #0B2A4D 0, transparent 40%), radial-gradient(circle at 85% 75%, #0B2A4D 0, transparent 35%)",
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 text-center flex flex-col items-center gap-4">
-          <span className="uppercase tracking-[0.2em] text-dorado text-xs font-bold">
+        <div className="relative max-w-6xl mx-auto px-4 py-14 sm:py-20 text-center flex flex-col items-center gap-4">
+          <Image src="/logo.png" alt="Liga Lujanense" width={96} height={106} className="h-24 w-auto drop-shadow-lg" priority />
+          <span className="uppercase tracking-[0.2em] text-marino-oscuro/80 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
             Temporada 2026
           </span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight">
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight drop-shadow-sm">
             Liga Lujanense de Fútbol
           </h1>
-          <p className="text-white/70 max-w-xl">
+          <p className="text-white/90 max-w-xl font-medium">
             Noticias, fixture, tabla de posiciones y clubes afiliados de la liga.
           </p>
           <div className="flex flex-wrap gap-3 justify-center mt-2">
             <Link
               href="/posiciones"
-              className="bg-dorado hover:bg-dorado-claro text-marino-oscuro font-bold px-5 py-2.5 rounded-full transition-colors"
+              className="bg-marino-oscuro hover:bg-marino text-white font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
             >
               Ver posiciones
             </Link>
             <Link
               href="/fixture"
-              className="bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-2.5 rounded-full transition-colors border border-white/20"
+              className="bg-white hover:bg-white/90 text-dorado-oscuro font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
             >
               Ver fixture
             </Link>
@@ -89,8 +91,8 @@ export default async function Home() {
                   href={`/noticias/${noticia.slug}`}
                   className="group flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
-                  <div className="h-32 bg-gradient-to-br from-marino to-marino-claro flex items-center justify-center">
-                    <span className="text-dorado font-black text-xs uppercase tracking-widest">
+                  <div className="h-32 bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">
+                    <span className="text-white font-black text-xs uppercase tracking-widest">
                       Liga Lujanense
                     </span>
                   </div>

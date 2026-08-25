@@ -30,8 +30,8 @@ export default async function NoticiasPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={noticia.imagen_url} alt={noticia.titulo} className="h-40 w-full object-cover" />
               ) : (
-                <div className="h-32 bg-gradient-to-br from-marino to-marino-claro flex items-center justify-center">
-                  <span className="text-dorado font-black text-xs uppercase tracking-widest">
+                <div className="h-32 bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">
+                  <span className="text-white font-black text-xs uppercase tracking-widest">
                     Liga Lujanense
                   </span>
                 </div>

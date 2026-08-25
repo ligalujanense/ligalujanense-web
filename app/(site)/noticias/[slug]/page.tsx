@@ -33,8 +33,8 @@ export default async function NoticiaDetallePage({
           className="rounded-xl w-full object-cover max-h-96"
         />
       ) : (
-        <div className="h-48 rounded-xl bg-gradient-to-br from-marino to-marino-claro flex items-center justify-center">
-          <span className="text-dorado font-black text-sm uppercase tracking-widest">
+        <div className="h-48 rounded-xl bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">
+          <span className="text-white font-black text-sm uppercase tracking-widest">
             Liga Lujanense
           </span>
         </div>
