@@ -20,18 +20,27 @@ export default async function NoticiaDetallePage({
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-dorado-oscuro">{noticia.titulo}</h1>
+      <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
+        Noticias
+      </span>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">{noticia.titulo}</h1>
       <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
-      {noticia.imagen_url && (
+      {noticia.imagen_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={noticia.imagen_url}
           alt={noticia.titulo}
-          className="rounded-lg w-full object-cover max-h-96"
+          className="rounded-xl w-full object-cover max-h-96"
         />
+      ) : (
+        <div className="h-48 rounded-xl bg-gradient-to-br from-marino to-marino-claro flex items-center justify-center">
+          <span className="text-dorado font-black text-sm uppercase tracking-widest">
+            Liga Lujanense
+          </span>
+        </div>
       )}
       {noticia.contenido && (
-        <div className="whitespace-pre-line text-neutral-700">
+        <div className="whitespace-pre-line text-neutral-700 leading-relaxed">
           {noticia.contenido}
         </div>
       )}

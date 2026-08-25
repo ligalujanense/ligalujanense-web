@@ -34,37 +34,59 @@ export default async function FixtureZonaPage({
   return (
     <main className="max-w-5xl mx-auto px-4 py-10 flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold text-dorado-oscuro">
-          Fixture — {zona.nombre}
+        <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
+          Fixture
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">
+          {zona.nombre}
         </h1>
         <p className="text-neutral-500 text-sm">{zona.temporada}</p>
       </div>
 
       {fechas && fechas.length > 0 ? (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           {fechas.map((fecha: any) => (
-            <section key={fecha.id} className="flex flex-col gap-2">
-              <h2 className="font-semibold text-neutral-700">
-                Fecha {fecha.numero_fecha}
-                {fecha.fecha ? ` — ${fecha.fecha}` : ""}
+            <section key={fecha.id} className="flex flex-col gap-3">
+              <h2 className="font-bold text-marino-oscuro flex items-center gap-2">
+                <span className="bg-marino-oscuro text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  Fecha {fecha.numero_fecha}
+                </span>
+                {fecha.fecha && <span className="text-neutral-500 text-sm font-normal">{fecha.fecha}</span>}
               </h2>
-              <div className="flex flex-col gap-1">
-                {fecha.partidos?.map((partido: any) => (
-                  <div
-                    key={partido.id}
-                    className="border border-neutral-200 rounded-lg px-4 py-2 flex items-center justify-between text-sm"
-                  >
-                    <span>
-                      {partido.equipo_local?.clubes?.nombre ?? "?"} vs{" "}
-                      {partido.equipo_visitante?.clubes?.nombre ?? "?"}
-                    </span>
-                    <span className="text-neutral-500">
-                      {partido.estado === "jugado"
-                        ? `${partido.resultado_local} - ${partido.resultado_visitante}`
-                        : partido.hora ?? "A definir"}
-                    </span>
-                  </div>
-                ))}
+              <div className="grid sm:grid-cols-2 gap-3">
+                {fecha.partidos?.map((partido: any) =>
+                  partido.libre_equipo ? (
+                    <div
+                      key={partido.id}
+                      className="border border-dashed border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-500 flex items-center justify-center"
+                    >
+                      {partido.libre_equipo.clubes?.nombre ?? "?"} — libre
+                    </div>
+                  ) : (
+                    <div
+                      key={partido.id}
+                      className="bg-white border border-neutral-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 hover:border-dorado transition-colors"
+                    >
+                      <span className="font-semibold text-marino-oscuro text-sm text-right flex-1">
+                        {partido.equipo_local?.clubes?.nombre ?? "?"}
+                      </span>
+                      <span
+                        className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${
+                          partido.estado === "jugado"
+                            ? "bg-marino-oscuro text-white"
+                            : "bg-dorado/15 text-dorado-oscuro"
+                        }`}
+                      >
+                        {partido.estado === "jugado"
+                          ? `${partido.resultado_local} - ${partido.resultado_visitante}`
+                          : partido.hora ?? "A definir"}
+                      </span>
+                      <span className="font-semibold text-marino-oscuro text-sm flex-1">
+                        {partido.equipo_visitante?.clubes?.nombre ?? "?"}
+                      </span>
+                    </div>
+                  )
+                )}
                 {fecha.partidos?.length === 0 && (
                   <p className="text-neutral-400 text-sm">Sin partidos cargados.</p>
                 )}

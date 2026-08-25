@@ -17,81 +17,118 @@ export default async function Home() {
     ]);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10 flex flex-col gap-12">
-      <section className="text-center flex flex-col gap-3 py-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-dorado-oscuro">
-          Liga Lujanense de Fútbol
-        </h1>
-        <p className="text-neutral-600">
-          Noticias, fixture, tabla de posiciones y clubes afiliados.
-        </p>
-      </section>
-
-      {zonas && zonas.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-xl font-bold">Zonas</h2>
-          <div className="flex flex-wrap gap-3">
-            {zonas.map((zona) => (
-              <Link
-                key={zona.id}
-                href={`/posiciones/${zona.id}`}
-                className="border border-neutral-200 rounded-lg px-4 py-3 hover:border-dorado transition-colors"
-              >
-                <p className="font-semibold">{zona.nombre}</p>
-                <p className="text-sm text-neutral-500">{zona.temporada}</p>
-              </Link>
-            ))}
+    <main className="flex flex-col">
+      <section className="relative bg-marino-oscuro overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, #D9A441 0, transparent 45%), radial-gradient(circle at 80% 60%, #123B6B 0, transparent 50%)",
+          }}
+        />
+        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 text-center flex flex-col items-center gap-4">
+          <span className="uppercase tracking-[0.2em] text-dorado text-xs font-bold">
+            Temporada 2026
+          </span>
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight">
+            Liga Lujanense de Fútbol
+          </h1>
+          <p className="text-white/70 max-w-xl">
+            Noticias, fixture, tabla de posiciones y clubes afiliados de la liga.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center mt-2">
+            <Link
+              href="/posiciones"
+              className="bg-dorado hover:bg-dorado-claro text-marino-oscuro font-bold px-5 py-2.5 rounded-full transition-colors"
+            >
+              Ver posiciones
+            </Link>
+            <Link
+              href="/fixture"
+              className="bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-2.5 rounded-full transition-colors border border-white/20"
+            >
+              Ver fixture
+            </Link>
           </div>
-        </section>
-      )}
-
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Últimas noticias</h2>
-          <Link href="/noticias" className="text-sm text-dorado-oscuro hover:underline">
-            Ver todas
-          </Link>
         </div>
-        {noticias && noticias.length > 0 ? (
-          <div className="grid sm:grid-cols-3 gap-4">
-            {noticias.map((noticia) => (
-              <Link
-                key={noticia.id}
-                href={`/noticias/${noticia.slug}`}
-                className="border border-neutral-200 rounded-lg p-4 hover:border-dorado transition-colors"
-              >
-                <p className="font-semibold">{noticia.titulo}</p>
-                {noticia.resumen && (
-                  <p className="text-sm text-neutral-500 mt-1 line-clamp-2">
-                    {noticia.resumen}
-                  </p>
-                )}
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="text-neutral-500 text-sm">Todavía no hay noticias publicadas.</p>
-        )}
       </section>
 
-      {sponsors && sponsors.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-xl font-bold">Sponsors</h2>
-          <div className="flex flex-wrap items-center gap-6">
-            {sponsors.map((sponsor) => (
-              <a
-                key={sponsor.id}
-                href={sponsor.url ?? "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-neutral-600 hover:text-dorado-oscuro"
-              >
-                {sponsor.nombre}
-              </a>
-            ))}
+      <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-14 w-full">
+        {zonas && zonas.length > 0 && (
+          <section className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-marino-oscuro">Zonas</h2>
+            <div className="flex flex-wrap gap-3">
+              {zonas.map((zona) => (
+                <Link
+                  key={zona.id}
+                  href={`/posiciones/${zona.id}`}
+                  className="group bg-white border border-neutral-200 rounded-xl px-5 py-4 hover:border-dorado hover:shadow-md transition-all min-w-[160px]"
+                >
+                  <p className="font-bold text-marino-oscuro group-hover:text-dorado-oscuro transition-colors">
+                    {zona.nombre}
+                  </p>
+                  <p className="text-sm text-neutral-500">{zona.temporada}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-marino-oscuro">Últimas noticias</h2>
+            <Link href="/noticias" className="text-sm font-semibold text-dorado-oscuro hover:underline">
+              Ver todas →
+            </Link>
           </div>
+          {noticias && noticias.length > 0 ? (
+            <div className="grid sm:grid-cols-3 gap-5">
+              {noticias.map((noticia) => (
+                <Link
+                  key={noticia.id}
+                  href={`/noticias/${noticia.slug}`}
+                  className="group flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="h-32 bg-gradient-to-br from-marino to-marino-claro flex items-center justify-center">
+                    <span className="text-dorado font-black text-xs uppercase tracking-widest">
+                      Liga Lujanense
+                    </span>
+                  </div>
+                  <div className="p-4 flex flex-col gap-1">
+                    <p className="font-bold text-marino-oscuro group-hover:text-dorado-oscuro transition-colors line-clamp-2">
+                      {noticia.titulo}
+                    </p>
+                    {noticia.resumen && (
+                      <p className="text-sm text-neutral-500 line-clamp-2">{noticia.resumen}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-neutral-500 text-sm">Todavía no hay noticias publicadas.</p>
+          )}
         </section>
-      )}
+
+        {sponsors && sponsors.length > 0 && (
+          <section className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-marino-oscuro">Sponsors</h2>
+            <div className="flex flex-wrap items-center gap-6 bg-white border border-neutral-200 rounded-xl px-6 py-5">
+              {sponsors.map((sponsor) => (
+                <a
+                  key={sponsor.id}
+                  href={sponsor.url ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-neutral-600 hover:text-dorado-oscuro"
+                >
+                  {sponsor.nombre}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

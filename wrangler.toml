@@ -6,3 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
+
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://lkhgfnguhfcffcyqzqlp.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxraGdmbmd1aGZjZmZjeXF6cWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MjUxOTAsImV4cCI6MjEwMzIwMTE5MH0.xO9ssHNCkQpklRvOSeMKrByIBgSKzfos0IGgnVGGclA"

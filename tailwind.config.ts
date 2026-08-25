@@ -20,8 +20,16 @@ const config: Config = {
           DEFAULT: "#4A90C4",
           oscuro: "#2C5F82",
         },
+        marino: {
+          DEFAULT: "#0B2A4D",
+          oscuro: "#071B33",
+          claro: "#123B6B",
+        },
         plata: "#B8BEC4",
-        crema: "#FAF6EC",
+        crema: "#F7F5F0",
+      },
+      fontFamily: {
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
       },
     },
   },
