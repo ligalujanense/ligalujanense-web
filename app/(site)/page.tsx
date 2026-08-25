@@ -24,12 +24,14 @@ export default async function Home() {
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 15% 25%, #0B2A4D 0, transparent 40%), radial-gradient(circle at 85% 75%, #0B2A4D 0, transparent 35%)",
+              "radial-gradient(circle at 15% 25%, #1E6FA0 0, transparent 40%), radial-gradient(circle at 85% 75%, #1E6FA0 0, transparent 35%)",
           }}
         />
         <div className="relative max-w-6xl mx-auto px-4 py-14 sm:py-20 text-center flex flex-col items-center gap-4">
-          <Image src="/logo.png" alt="Liga Lujanense" width={96} height={106} className="h-24 w-auto drop-shadow-lg" priority />
-          <span className="uppercase tracking-[0.2em] text-marino-oscuro/80 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
+          <div className="bg-white rounded-full p-4 shadow-xl ring-4 ring-white/40">
+            <Image src="/logo.png" alt="Liga Lujanense" width={96} height={106} className="h-20 w-auto" priority />
+          </div>
+          <span className="uppercase tracking-[0.2em] text-celeste-oscuro/80 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
             Temporada 2026
           </span>
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight drop-shadow-sm">
@@ -41,7 +43,7 @@ export default async function Home() {
           <div className="flex flex-wrap gap-3 justify-center mt-2">
             <Link
               href="/posiciones"
-              className="bg-marino-oscuro hover:bg-marino text-white font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              className="bg-celeste-oscuro hover:bg-celeste text-white font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
             >
               Ver posiciones
             </Link>
@@ -58,7 +60,7 @@ export default async function Home() {
       <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-14 w-full">
         {zonas && zonas.length > 0 && (
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-marino-oscuro">Zonas</h2>
+            <h2 className="text-xl font-bold text-celeste-oscuro">Zonas</h2>
             <div className="flex flex-wrap gap-3">
               {zonas.map((zona) => (
                 <Link
@@ -66,7 +68,7 @@ export default async function Home() {
                   href={`/posiciones/${zona.id}`}
                   className="group bg-white border border-neutral-200 rounded-xl px-5 py-4 hover:border-dorado hover:shadow-md transition-all min-w-[160px]"
                 >
-                  <p className="font-bold text-marino-oscuro group-hover:text-dorado-oscuro transition-colors">
+                  <p className="font-bold text-celeste-oscuro group-hover:text-dorado-oscuro transition-colors">
                     {zona.nombre}
                   </p>
                   <p className="text-sm text-neutral-500">{zona.temporada}</p>
@@ -78,7 +80,7 @@ export default async function Home() {
 
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-marino-oscuro">Últimas noticias</h2>
+            <h2 className="text-xl font-bold text-celeste-oscuro">Últimas noticias</h2>
             <Link href="/noticias" className="text-sm font-semibold text-dorado-oscuro hover:underline">
               Ver todas →
             </Link>
@@ -97,7 +99,7 @@ export default async function Home() {
                     </span>
                   </div>
                   <div className="p-4 flex flex-col gap-1">
-                    <p className="font-bold text-marino-oscuro group-hover:text-dorado-oscuro transition-colors line-clamp-2">
+                    <p className="font-bold text-celeste-oscuro group-hover:text-dorado-oscuro transition-colors line-clamp-2">
                       {noticia.titulo}
                     </p>
                     {noticia.resumen && (
@@ -114,7 +116,7 @@ export default async function Home() {
 
         {sponsors && sponsors.length > 0 && (
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-marino-oscuro">Sponsors</h2>
+            <h2 className="text-xl font-bold text-celeste-oscuro">Sponsors</h2>
             <div className="flex flex-wrap items-center gap-6 bg-white border border-neutral-200 rounded-xl px-6 py-5">
               {sponsors.map((sponsor) => (
                 <a

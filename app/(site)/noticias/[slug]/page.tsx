@@ -23,7 +23,7 @@ export default async function NoticiaDetallePage({
       <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
         Noticias
       </span>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">{noticia.titulo}</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">{noticia.titulo}</h1>
       <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
       {noticia.imagen_url ? (
         // eslint-disable-next-line @next/next/no-img-element

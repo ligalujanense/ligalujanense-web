@@ -15,7 +15,7 @@ export default async function NoticiasPage() {
         <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
           Noticias
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">Novedades de la liga</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">Novedades de la liga</h1>
       </div>
 
       {noticias && noticias.length > 0 ? (
@@ -37,7 +37,7 @@ export default async function NoticiasPage() {
                 </div>
               )}
               <div className="p-4 flex flex-col gap-1">
-                <p className="font-bold text-marino-oscuro group-hover:text-dorado-oscuro transition-colors line-clamp-2">
+                <p className="font-bold text-celeste-oscuro group-hover:text-dorado-oscuro transition-colors line-clamp-2">
                   {noticia.titulo}
                 </p>
                 {noticia.resumen && (

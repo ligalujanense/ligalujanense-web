@@ -37,7 +37,7 @@ export default async function FixtureZonaPage({
         <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
           Fixture
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">
           {zona.nombre}
         </h1>
         <p className="text-neutral-500 text-sm">{zona.temporada}</p>
@@ -47,8 +47,8 @@ export default async function FixtureZonaPage({
         <div className="flex flex-col gap-8">
           {fechas.map((fecha: any) => (
             <section key={fecha.id} className="flex flex-col gap-3">
-              <h2 className="font-bold text-marino-oscuro flex items-center gap-2">
-                <span className="bg-marino-oscuro text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              <h2 className="font-bold text-celeste-oscuro flex items-center gap-2">
+                <span className="bg-celeste-oscuro text-white text-xs font-bold px-2.5 py-1 rounded-full">
                   Fecha {fecha.numero_fecha}
                 </span>
                 {fecha.fecha && <span className="text-neutral-500 text-sm font-normal">{fecha.fecha}</span>}
@@ -67,13 +67,13 @@ export default async function FixtureZonaPage({
                       key={partido.id}
                       className="bg-white border border-neutral-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 hover:border-dorado transition-colors"
                     >
-                      <span className="font-semibold text-marino-oscuro text-sm text-right flex-1">
+                      <span className="font-semibold text-celeste-oscuro text-sm text-right flex-1">
                         {partido.equipo_local?.clubes?.nombre ?? "?"}
                       </span>
                       <span
                         className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${
                           partido.estado === "jugado"
-                            ? "bg-marino-oscuro text-white"
+                            ? "bg-celeste-oscuro text-white"
                             : "bg-dorado/15 text-dorado-oscuro"
                         }`}
                       >
@@ -81,7 +81,7 @@ export default async function FixtureZonaPage({
                           ? `${partido.resultado_local} - ${partido.resultado_visitante}`
                           : partido.hora ?? "A definir"}
                       </span>
-                      <span className="font-semibold text-marino-oscuro text-sm flex-1">
+                      <span className="font-semibold text-celeste-oscuro text-sm flex-1">
                         {partido.equipo_visitante?.clubes?.nombre ?? "?"}
                       </span>
                     </div>

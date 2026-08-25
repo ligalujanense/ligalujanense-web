@@ -14,7 +14,7 @@ export default async function PosicionesZonasPage() {
         <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
           Posiciones
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-marino-oscuro">Elegí una zona</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">Elegí una zona</h1>
       </div>
 
       {zonas && zonas.length > 0 ? (
@@ -25,7 +25,7 @@ export default async function PosicionesZonasPage() {
               href={`/posiciones/${zona.id}`}
               className="bg-white border border-neutral-200 rounded-xl px-5 py-4 hover:border-dorado hover:shadow-md transition-all min-w-[160px]"
             >
-              <p className="font-bold text-marino-oscuro">{zona.nombre}</p>
+              <p className="font-bold text-celeste-oscuro">{zona.nombre}</p>
               <p className="text-sm text-neutral-500">{zona.temporada}</p>
             </Link>
           ))}
