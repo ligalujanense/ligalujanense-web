@@ -26,9 +26,9 @@ const config: Config = {
           claro: "#123B6B",
         },
         celeste: {
-          DEFAULT: "#5FB2E0",
-          oscuro: "#1E6FA0",
-          claro: "#A9DBF2",
+          DEFAULT: "#3FC1F0",
+          oscuro: "#0E7FAE",
+          claro: "#8FE0FA",
         },
         plata: "#B8BEC4",
         crema: "#F7F5F0",
