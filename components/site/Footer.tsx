@@ -8,11 +8,14 @@ export function Footer() {
           <Image src="/logo.png" alt="Liga Lujanense" width={28} height={32} className="h-7 w-auto" />
           Liga Lujanense de Fútbol
         </div>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <a href="/institucional" className="hover:text-white transition-colors">
             Reglamento y estatutos
           </a>
           <span>© {new Date().getFullYear()}</span>
+          <a href="/admin" className="text-white/40 hover:text-white/70 transition-colors text-xs">
+            Acceso liga
+          </a>
         </div>
       </div>
     </footer>

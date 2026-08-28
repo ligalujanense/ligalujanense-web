@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { subirDocumento } from "@/lib/upload-actions";
 
 export function PdfUploader({
   path,
@@ -23,19 +23,19 @@ export function PdfUploader({
     setUploading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: uploadError } = await supabase.storage
-      .from("documentos")
-      .upload(path, file, { upsert: true });
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("path", path);
+    const result = await subirDocumento(formData);
 
     setUploading(false);
 
-    if (uploadError) {
-      setError("No se pudo subir el archivo.");
+    if (result.error) {
+      setError(result.error);
       return;
     }
 
-    startTransition(() => onUploaded(path));
+    startTransition(() => { onUploaded(path); });
   }
 
   return (

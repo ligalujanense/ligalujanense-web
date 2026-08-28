@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { subirImagen } from "@/lib/upload-actions";
 
 export function ImageUploader({
   pathPrefix,
@@ -23,24 +23,20 @@ export function ImageUploader({
     setUploading(true);
     setError(null);
 
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `${pathPrefix}/${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("imagenes")
-      .upload(path, file, { upsert: true });
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("pathPrefix", pathPrefix);
+    const result = await subirImagen(formData);
 
     setUploading(false);
 
-    if (uploadError) {
-      setError("No se pudo subir la imagen.");
+    if (result.error || !result.url) {
+      setError(result.error ?? "No se pudo subir la imagen.");
       return;
     }
 
-    const { data } = supabase.storage.from("imagenes").getPublicUrl(path);
-    setPreview(data.publicUrl);
-    onUploaded(data.publicUrl);
+    setPreview(result.url);
+    onUploaded(result.url);
   }
 
   return (
