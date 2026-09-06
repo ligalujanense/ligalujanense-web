@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 const links = [
-  { href: "/", label: "Inicio" },
   { href: "/noticias", label: "Noticias" },
   { href: "/fixture", label: "Fixture" },
   { href: "/posiciones", label: "Posiciones" },
@@ -12,18 +11,19 @@ const links = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b-2 border-dorado">
-      <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 font-extrabold text-lg text-celeste-oscuro tracking-tight">
-          <Image src="/logo.png" alt="Liga Lujanense" width={40} height={44} className="h-10 w-auto" priority />
-          <span className="hidden sm:inline">Liga Lujanense</span>
+    <header className="sticky top-0 z-50 bg-white">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <Link href="/" className="shrink-0">
+          <span className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-dorado p-1.5">
+            <Image src="/logo.png" alt="Liga Lujanense" width={44} height={49} className="w-full h-auto" priority />
+          </span>
         </Link>
-        <nav className="flex flex-wrap gap-x-1 text-sm font-semibold">
+        <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="px-3 py-2 rounded-md text-neutral-600 hover:text-celeste-oscuro hover:bg-dorado/10 transition-colors"
+              className="px-2.5 sm:px-3 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-celeste-oscuro/80 hover:text-dorado-oscuro transition-colors"
             >
               {link.label}
             </Link>
