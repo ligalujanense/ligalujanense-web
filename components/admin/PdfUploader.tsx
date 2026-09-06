@@ -20,22 +20,33 @@ export function PdfUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    setError(null);
-
-    const formData = new FormData();
-    formData.set("file", file);
-    formData.set("path", path);
-    const result = await subirDocumento(formData);
-
-    setUploading(false);
-
-    if (result.error) {
-      setError(result.error);
+    const MAX_MB = 10;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setError(`El archivo pesa demasiado (máx. ${MAX_MB}MB).`);
+      e.target.value = "";
       return;
     }
 
-    startTransition(() => { onUploaded(path); });
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("path", path);
+      const result = await subirDocumento(formData);
+
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+
+      startTransition(() => { onUploaded(path); });
+    } catch {
+      setError("No se pudo subir el archivo. Probá con uno más chico.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (

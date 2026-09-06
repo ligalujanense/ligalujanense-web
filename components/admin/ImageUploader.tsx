@@ -22,25 +22,36 @@ export function ImageUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_MB = 10;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setError(`La imagen pesa demasiado (máx. ${MAX_MB}MB). Achicala e intentá de nuevo.`);
+      e.target.value = "";
+      return;
+    }
+
     setUploading(true);
     onUploadingChange?.(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.set("file", file);
-    formData.set("pathPrefix", pathPrefix);
-    const result = await subirImagen(formData);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("pathPrefix", pathPrefix);
+      const result = await subirImagen(formData);
 
-    setUploading(false);
-    onUploadingChange?.(false);
+      if (result.error || !result.url) {
+        setError(result.error ?? "No se pudo subir la imagen.");
+        return;
+      }
 
-    if (result.error || !result.url) {
-      setError(result.error ?? "No se pudo subir la imagen.");
-      return;
+      setPreview(result.url);
+      onUploaded(result.url);
+    } catch {
+      setError("No se pudo subir la imagen. Probá con un archivo más chico.");
+    } finally {
+      setUploading(false);
+      onUploadingChange?.(false);
     }
-
-    setPreview(result.url);
-    onUploaded(result.url);
   }
 
   return (
