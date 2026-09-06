@@ -9,6 +9,7 @@ type Noticia = { id: string; titulo: string; publicado: boolean };
 export function NoticiasAdminList({ noticias }: { noticias: Noticia[] }) {
   const [isPending, startTransition] = useTransition();
   const [imagenUrl, setImagenUrl] = useState("");
+  const [imagenUploading, setImagenUploading] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,7 +34,7 @@ export function NoticiasAdminList({ noticias }: { noticias: Noticia[] }) {
         </label>
         <label className="flex flex-col gap-1 text-sm">
           Imagen
-          <ImageUploader pathPrefix="noticias" onUploaded={setImagenUrl} />
+          <ImageUploader pathPrefix="noticias" onUploaded={setImagenUrl} onUploadingChange={setImagenUploading} />
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="publicado" />
@@ -41,10 +42,10 @@ export function NoticiasAdminList({ noticias }: { noticias: Noticia[] }) {
         </label>
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || imagenUploading}
           className="bg-dorado hover:bg-dorado-oscuro text-white font-semibold rounded px-4 py-2 disabled:opacity-50 self-start"
         >
-          Crear noticia
+          {imagenUploading ? "Esperando la imagen..." : "Crear noticia"}
         </button>
       </form>
 

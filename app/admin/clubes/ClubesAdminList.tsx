@@ -15,6 +15,7 @@ type Club = {
 export function ClubesAdminList({ clubes }: { clubes: Club[] }) {
   const [isPending, startTransition] = useTransition();
   const [logoUrl, setLogoUrl] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
@@ -39,14 +40,14 @@ export function ClubesAdminList({ clubes }: { clubes: Club[] }) {
         </label>
         <label className="flex flex-col gap-1 text-sm">
           Logo
-          <ImageUploader pathPrefix="clubes" onUploaded={setLogoUrl} />
+          <ImageUploader pathPrefix="clubes" onUploaded={setLogoUrl} onUploadingChange={setLogoUploading} />
         </label>
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || logoUploading}
           className="bg-dorado hover:bg-dorado-oscuro text-white font-semibold rounded px-4 py-2 disabled:opacity-50 self-start"
         >
-          Agregar club
+          {logoUploading ? "Esperando el logo..." : "Agregar club"}
         </button>
       </form>
 

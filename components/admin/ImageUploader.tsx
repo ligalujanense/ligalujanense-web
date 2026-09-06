@@ -7,10 +7,12 @@ export function ImageUploader({
   pathPrefix,
   currentUrl,
   onUploaded,
+  onUploadingChange,
 }: {
   pathPrefix: string;
   currentUrl?: string | null;
   onUploaded: (url: string) => void;
+  onUploadingChange?: (uploading: boolean) => void;
 }) {
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
   const [uploading, setUploading] = useState(false);
@@ -21,6 +23,7 @@ export function ImageUploader({
     if (!file) return;
 
     setUploading(true);
+    onUploadingChange?.(true);
     setError(null);
 
     const formData = new FormData();
@@ -29,6 +32,7 @@ export function ImageUploader({
     const result = await subirImagen(formData);
 
     setUploading(false);
+    onUploadingChange?.(false);
 
     if (result.error || !result.url) {
       setError(result.error ?? "No se pudo subir la imagen.");
