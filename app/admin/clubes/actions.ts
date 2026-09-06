@@ -26,6 +26,31 @@ export async function crearClub(formData: FormData) {
   revalidatePath("/clubes");
 }
 
+export async function actualizarClub(id: string, formData: FormData) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const nombre = String(formData.get("nombre") ?? "").trim();
+  const direccion = String(formData.get("direccion") ?? "").trim();
+  const contacto = String(formData.get("contacto") ?? "").trim();
+  const logo_url = String(formData.get("logo_url") ?? "").trim();
+  if (!nombre) return { error: "Falta el nombre" };
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("clubes")
+    .update({
+      nombre,
+      direccion: direccion || null,
+      contacto: contacto || null,
+      logo_url: logo_url || null,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/clubes");
+  revalidatePath("/clubes");
+}
+
 export async function eliminarClub(id: string) {
   if (!(await isAdmin())) return { error: "No autorizado" };
 
