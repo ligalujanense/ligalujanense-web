@@ -13,9 +13,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <Link href="/" className="shrink-0">
-          <span className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-dorado p-1.5">
+        <Link href="/" className="shrink-0 flex items-center gap-3">
+          <span className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-dorado p-1.5 shrink-0">
             <Image src="/logo.png" alt="Liga Lujanense" width={44} height={49} className="w-full h-auto" priority />
+          </span>
+          <span className="hidden sm:block font-extrabold text-celeste-oscuro leading-tight text-sm tracking-tight">
+            Liga Lujanense
+            <br />
+            de Fútbol
           </span>
         </Link>
         <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
