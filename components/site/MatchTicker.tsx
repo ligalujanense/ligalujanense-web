@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { TickerPartido } from "@/lib/match-ticker";
+import { tituloTicker, type TickerPartido } from "@/lib/match-ticker";
 
 function MatchCard({ partido }: { partido: TickerPartido }) {
   return (
@@ -30,13 +30,7 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
   );
 }
 
-export function MatchTicker({
-  partidos,
-  modo,
-}: {
-  partidos: TickerPartido[];
-  modo: "jugada" | "proxima";
-}) {
+export function MatchTicker({ partidos }: { partidos: TickerPartido[] }) {
   if (partidos.length === 0) return null;
 
   // Duplicamos la lista para que el loop de la cinta sea continuo (sin salto visible).
@@ -46,7 +40,7 @@ export function MatchTicker({
     <section className="bg-celeste-oscuro py-4 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between mb-3">
         <span className="text-white font-bold uppercase text-xs tracking-widest">
-          {modo === "jugada" ? "Última fecha jugada" : "Próxima fecha"}
+          {tituloTicker(partidos)}
         </span>
         <Link href="/fixture" className="text-dorado-claro text-xs font-bold hover:underline">
           Ver todo el fixture →

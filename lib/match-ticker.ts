@@ -11,44 +11,29 @@ export type TickerPartido = {
 
 type FechaConPartidos = {
   numero_fecha: number;
-  partidos: { estado: string }[];
+  partidos: unknown[];
 };
 
 /**
- * Regla de negocio de la liga: el fixture se define los miércoles y se juega
- * sábado/domingo. De lunes a miércoles se muestra la última fecha jugada;
- * de jueves a domingo, la próxima fecha programada.
+ * Elige, dentro de las fechas de una zona, la fecha "activa": la más
+ * reciente que ya tenga partidos cargados (sin importar si están
+ * pendientes o jugados). Así el ticker refleja directamente lo que el
+ * encargado fue cargando: apenas sube el fixture del fin de semana se ve
+ * como próximos partidos, y en cuanto carga los resultados pasa a
+ * mostrarlos, sin depender del día de la semana.
  */
-export function calcularModo(ahora: Date = new Date()): "jugada" | "proxima" {
-  const local = new Date(
-    ahora.toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })
-  );
-  const dia = local.getDay(); // 0 domingo ... 6 sábado
-  return dia >= 1 && dia <= 3 ? "jugada" : "proxima";
+export function elegirFechaActiva<T extends FechaConPartidos>(fechas: T[]): T | null {
+  const conPartidos = fechas.filter((f) => f.partidos.length > 0);
+  if (conPartidos.length === 0) return null;
+  return conPartidos.reduce((a, b) => (a.numero_fecha > b.numero_fecha ? a : b));
 }
 
-/** Elige, dentro de las fechas de una zona, cuál es la "activa" según el modo. */
-export function elegirFechaActiva<T extends FechaConPartidos>(
-  fechas: T[],
-  modo: "jugada" | "proxima"
-): T | null {
-  if (fechas.length === 0) return null;
-
-  const conResultado = fechas.filter((f) => f.partidos.some((p) => p.estado === "jugado"));
-  const ultimaJugada =
-    conResultado.length > 0
-      ? conResultado.reduce((a, b) => (a.numero_fecha > b.numero_fecha ? a : b))
-      : null;
-
-  if (modo === "jugada") {
-    return ultimaJugada ?? fechas.reduce((a, b) => (a.numero_fecha < b.numero_fecha ? a : b));
-  }
-
-  // modo "proxima": la fecha siguiente a la última jugada, o la primera si el torneo no arrancó
-  if (ultimaJugada) {
-    return (
-      fechas.find((f) => f.numero_fecha === ultimaJugada.numero_fecha + 1) ?? ultimaJugada
-    );
-  }
-  return fechas.reduce((a, b) => (a.numero_fecha < b.numero_fecha ? a : b));
+/** Título de la cinta según la mezcla de estados que terminó trayendo cada zona. */
+export function tituloTicker(partidos: { estado: string }[]): string {
+  if (partidos.length === 0) return "Fixture";
+  const todosJugados = partidos.every((p) => p.estado === "jugado");
+  if (todosJugados) return "Últimos resultados";
+  const todosPendientes = partidos.every((p) => p.estado !== "jugado");
+  if (todosPendientes) return "Próximos partidos";
+  return "Fixture";
 }
