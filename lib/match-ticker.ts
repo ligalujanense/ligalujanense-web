@@ -2,7 +2,9 @@ export type TickerPartido = {
   id: string;
   zona: string;
   local: string;
+  logoLocal: string | null;
   visitante: string;
+  logoVisitante: string | null;
   estado: string;
   resultado_local: number | null;
   resultado_visitante: number | null;

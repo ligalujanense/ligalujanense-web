@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
-import { QuickLinks } from "@/components/site/QuickLinks";
 import { MatchTicker } from "@/components/site/MatchTicker";
 import { elegirFechaActiva, type TickerPartido } from "@/lib/match-ticker";
 
@@ -32,8 +31,8 @@ export default async function Home() {
             `numero_fecha,
              partidos (
                id, estado, hora, resultado_local, resultado_visitante, libre_equipo_id,
-               equipo_local:equipo_local_id ( clubes ( nombre ) ),
-               equipo_visitante:equipo_visitante_id ( clubes ( nombre ) )
+               equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
+               equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) )
              )`
           )
           .eq("zona_id", zona.id)
@@ -52,7 +51,9 @@ export default async function Home() {
           id: partido.id,
           zona: zona.nombre,
           local: partido.equipo_local?.clubes?.nombre ?? "?",
+          logoLocal: partido.equipo_local?.clubes?.logo_url ?? null,
           visitante: partido.equipo_visitante?.clubes?.nombre ?? "?",
+          logoVisitante: partido.equipo_visitante?.clubes?.logo_url ?? null,
           estado: partido.estado,
           resultado_local: partido.resultado_local,
           resultado_visitante: partido.resultado_visitante,
@@ -109,8 +110,6 @@ export default async function Home() {
       )}
 
       <MatchTicker partidos={tickerPartidos} />
-
-      <QuickLinks />
 
       <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-14 w-full">
         {zonas && zonas.length > 0 && (

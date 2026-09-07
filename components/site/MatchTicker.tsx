@@ -1,15 +1,32 @@
 import Link from "next/link";
 import { tituloTicker, type TickerPartido } from "@/lib/match-ticker";
 
+function EscudoClub({ nombre, logoUrl }: { nombre: string; logoUrl: string | null }) {
+  if (logoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={logoUrl} alt="" className="w-7 h-7 object-contain shrink-0" />
+    );
+  }
+  return (
+    <span className="w-7 h-7 rounded-full bg-celeste-oscuro/10 text-celeste-oscuro flex items-center justify-center text-[10px] font-bold shrink-0">
+      {nombre.charAt(0)}
+    </span>
+  );
+}
+
 function MatchCard({ partido }: { partido: TickerPartido }) {
   return (
-    <div className="shrink-0 min-w-[240px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm">
+    <div className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm">
       <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
         {partido.zona}
       </span>
       <div className="flex items-center gap-2 w-full justify-center">
-        <span className="text-sm font-semibold text-celeste-oscuro text-right flex-1 truncate">
-          {partido.local}
+        <span className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
+          <span className="text-sm font-semibold text-celeste-oscuro text-right truncate">
+            {partido.local}
+          </span>
+          <EscudoClub nombre={partido.local} logoUrl={partido.logoLocal} />
         </span>
         <span
           className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ${
@@ -22,8 +39,11 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
             ? `${partido.resultado_local} - ${partido.resultado_visitante}`
             : partido.hora ?? "A definir"}
         </span>
-        <span className="text-sm font-semibold text-celeste-oscuro flex-1 truncate">
-          {partido.visitante}
+        <span className="flex items-center gap-1.5 flex-1 min-w-0">
+          <EscudoClub nombre={partido.visitante} logoUrl={partido.logoVisitante} />
+          <span className="text-sm font-semibold text-celeste-oscuro truncate">
+            {partido.visitante}
+          </span>
         </span>
       </div>
     </div>
