@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { QuickLinks } from "@/components/site/QuickLinks";
+import { MatchTicker } from "@/components/site/MatchTicker";
+import { calcularModo, elegirFechaActiva, type TickerPartido } from "@/lib/match-ticker";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,6 +20,48 @@ export default async function Home() {
       supabase.from("sponsors").select("id, nombre, logo_url, url").order("orden"),
       supabase.from("zonas").select("id, nombre, temporada").order("nombre"),
     ]);
+
+  const modo = calcularModo();
+  const tickerPartidos: TickerPartido[] = [];
+
+  if (zonas && zonas.length > 0) {
+    const zonasConFechas = await Promise.all(
+      zonas.map(async (zona) => {
+        const { data: fechas } = await supabase
+          .from("fixture_fechas")
+          .select(
+            `numero_fecha,
+             partidos (
+               id, estado, hora, resultado_local, resultado_visitante, libre_equipo_id,
+               equipo_local:equipo_local_id ( clubes ( nombre ) ),
+               equipo_visitante:equipo_visitante_id ( clubes ( nombre ) )
+             )`
+          )
+          .eq("zona_id", zona.id)
+          .order("numero_fecha");
+        return { zona, fechas: fechas ?? [] };
+      })
+    );
+
+    for (const { zona, fechas } of zonasConFechas) {
+      const fechaActiva = elegirFechaActiva(fechas as any, modo);
+      if (!fechaActiva) continue;
+
+      for (const partido of (fechaActiva as any).partidos ?? []) {
+        if (partido.libre_equipo_id) continue;
+        tickerPartidos.push({
+          id: partido.id,
+          zona: zona.nombre,
+          local: partido.equipo_local?.clubes?.nombre ?? "?",
+          visitante: partido.equipo_visitante?.clubes?.nombre ?? "?",
+          estado: partido.estado,
+          resultado_local: partido.resultado_local,
+          resultado_visitante: partido.resultado_visitante,
+          hora: partido.hora,
+        });
+      }
+    }
+  }
 
   return (
     <main className="flex flex-col">
@@ -64,6 +108,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      <MatchTicker partidos={tickerPartidos} modo={modo} />
 
       <QuickLinks />
 
