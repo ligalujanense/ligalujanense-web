@@ -10,6 +10,7 @@ const linksAdminGeneral = [
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/noticias", label: "Noticias" },
   { href: "/admin/sponsors", label: "Sponsors" },
+  { href: "/admin/institucional", label: "Institucional" },
   { href: "/admin/autoridades", label: "Autoridades" },
 ];
 
