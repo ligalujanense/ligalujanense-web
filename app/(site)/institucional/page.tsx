@@ -32,19 +32,11 @@ export default async function InstitucionalPage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-xl sm:text-2xl font-extrabold text-celeste-oscuro">Autoridades</h2>
         {autoridades && autoridades.length > 0 ? (
-          <ul className="grid sm:grid-cols-2 gap-3">
+          <ul className="flex flex-col divide-y divide-neutral-200 bg-white border border-neutral-200 rounded-xl max-w-2xl">
             {autoridades.map((persona) => (
-              <li
-                key={persona.id}
-                className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-full bg-celeste-oscuro flex items-center justify-center text-dorado font-bold text-sm shrink-0">
-                  {persona.nombre.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-celeste-oscuro">{persona.nombre}</p>
-                  <p className="text-sm text-neutral-500">{persona.cargo}</p>
-                </div>
+              <li key={persona.id} className="px-4 py-3">
+                <p className="font-semibold text-celeste-oscuro">{persona.nombre}</p>
+                <p className="text-sm text-neutral-500">{persona.cargo}</p>
               </li>
             ))}
           </ul>
