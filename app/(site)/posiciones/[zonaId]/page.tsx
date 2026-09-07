@@ -1,7 +1,13 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { calcularPosiciones } from "@/lib/posiciones";
+import { calcularPosiciones, calcularUltimosResultados } from "@/lib/posiciones";
 import { ShareButtons } from "@/components/site/ShareButtons";
+
+const COLOR_RESULTADO: Record<string, string> = {
+  V: "bg-green-600",
+  E: "bg-neutral-400",
+  D: "bg-red-600",
+};
 
 export default async function PosicionesZonaPage({
   params,
@@ -32,11 +38,16 @@ export default async function PosicionesZonaPage({
   const { data: fechas } = await supabase
     .from("fixture_fechas")
     .select(
-      `partidos ( equipo_local_id, equipo_visitante_id, resultado_local, resultado_visitante, estado )`
+      `numero_fecha, partidos ( equipo_local_id, equipo_visitante_id, resultado_local, resultado_visitante, estado )`
     )
     .eq("zona_id", zonaId);
 
-  const partidos = (fechas ?? []).flatMap((fecha: any) => fecha.partidos ?? []);
+  const partidos = (fechas ?? []).flatMap((fecha: any) =>
+    (fecha.partidos ?? []).map((partido: any) => ({
+      ...partido,
+      numero_fecha: fecha.numero_fecha,
+    }))
+  );
   const tabla = calcularPosiciones(partidos, equipos);
 
   return (
@@ -69,36 +80,56 @@ export default async function PosicionesZonaPage({
                 <th className="p-3 text-center font-semibold">GC</th>
                 <th className="p-3 text-center font-semibold">DG</th>
                 <th className="p-3 text-center font-bold text-dorado">Pts</th>
+                <th className="p-3 text-center font-semibold">Últimos 5</th>
               </tr>
             </thead>
             <tbody className="bg-white">
-              {tabla.map((fila, i) => (
-                <tr
-                  key={fila.equipo_id}
-                  className={`border-b border-neutral-100 last:border-0 ${
-                    i === 0 ? "bg-dorado/10" : "hover:bg-neutral-50"
-                  }`}
-                >
-                  <td className="p-3">
-                    <span
-                      className={`w-6 h-6 inline-flex items-center justify-center rounded-full text-xs font-bold ${
-                        i === 0 ? "bg-dorado text-celeste-oscuro" : "text-neutral-500"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                  </td>
-                  <td className="p-3 font-semibold text-celeste-oscuro">{fila.nombre}</td>
-                  <td className="p-3 text-center">{fila.pj}</td>
-                  <td className="p-3 text-center">{fila.pg}</td>
-                  <td className="p-3 text-center">{fila.pe}</td>
-                  <td className="p-3 text-center">{fila.pp}</td>
-                  <td className="p-3 text-center">{fila.gf}</td>
-                  <td className="p-3 text-center">{fila.gc}</td>
-                  <td className="p-3 text-center">{fila.dg}</td>
-                  <td className="p-3 text-center font-extrabold text-celeste-oscuro">{fila.pts}</td>
-                </tr>
-              ))}
+              {tabla.map((fila, i) => {
+                const ultimos = calcularUltimosResultados(partidos, fila.equipo_id);
+                return (
+                  <tr
+                    key={fila.equipo_id}
+                    className={`border-b border-neutral-100 last:border-0 ${
+                      i === 0 ? "bg-dorado/10" : "hover:bg-neutral-50"
+                    }`}
+                  >
+                    <td className="p-3">
+                      <span
+                        className={`w-6 h-6 inline-flex items-center justify-center rounded-full text-xs font-bold ${
+                          i === 0 ? "bg-dorado text-celeste-oscuro" : "text-neutral-500"
+                        }`}
+                      >
+                        {i + 1}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold text-celeste-oscuro">{fila.nombre}</td>
+                    <td className="p-3 text-center">{fila.pj}</td>
+                    <td className="p-3 text-center">{fila.pg}</td>
+                    <td className="p-3 text-center">{fila.pe}</td>
+                    <td className="p-3 text-center">{fila.pp}</td>
+                    <td className="p-3 text-center">{fila.gf}</td>
+                    <td className="p-3 text-center">{fila.gc}</td>
+                    <td className="p-3 text-center">{fila.dg}</td>
+                    <td className="p-3 text-center font-extrabold text-celeste-oscuro">{fila.pts}</td>
+                    <td className="p-3">
+                      <div className="flex items-center justify-center gap-1">
+                        {ultimos.length > 0 ? (
+                          ultimos.map((resultado, idx) => (
+                            <span
+                              key={idx}
+                              className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white ${COLOR_RESULTADO[resultado]}`}
+                            >
+                              {resultado}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-neutral-300 text-xs">—</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

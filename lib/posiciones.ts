@@ -4,6 +4,7 @@ export type PartidoJugado = {
   resultado_local: number | null;
   resultado_visitante: number | null;
   estado: string;
+  numero_fecha: number;
 };
 
 export type EquipoNombre = { id: string; nombre: string };
@@ -86,4 +87,33 @@ export function calcularPosiciones(
   return Array.from(tabla.values())
     .map((fila) => ({ ...fila, dg: fila.gf - fila.gc }))
     .sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+}
+
+export type ResultadoReciente = "V" | "E" | "D";
+
+/** Últimos N resultados de un equipo (jugados), en orden cronológico (el más viejo primero). */
+export function calcularUltimosResultados(
+  partidos: PartidoJugado[],
+  equipoId: string,
+  cantidad = 5
+): ResultadoReciente[] {
+  const jugados = partidos
+    .filter(
+      (p) =>
+        p.estado === "jugado" &&
+        p.resultado_local !== null &&
+        p.resultado_visitante !== null &&
+        (p.equipo_local_id === equipoId || p.equipo_visitante_id === equipoId)
+    )
+    .sort((a, b) => a.numero_fecha - b.numero_fecha)
+    .slice(-cantidad);
+
+  return jugados.map((p) => {
+    const esLocal = p.equipo_local_id === equipoId;
+    const golesPropios = (esLocal ? p.resultado_local : p.resultado_visitante)!;
+    const golesRival = (esLocal ? p.resultado_visitante : p.resultado_local)!;
+    if (golesPropios > golesRival) return "V";
+    if (golesPropios < golesRival) return "D";
+    return "E";
+  });
 }
