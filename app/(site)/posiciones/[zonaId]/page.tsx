@@ -38,7 +38,7 @@ export default async function PosicionesZonaPage({
   const { data: fechas } = await supabase
     .from("fixture_fechas")
     .select(
-      `numero_fecha, partidos ( equipo_local_id, equipo_visitante_id, resultado_local, resultado_visitante, estado )`
+      `numero_fecha, partidos ( id, equipo_local_id, equipo_visitante_id, resultado_local, resultado_visitante, estado )`
     )
     .eq("zona_id", zonaId);
 
@@ -49,6 +49,34 @@ export default async function PosicionesZonaPage({
     }))
   );
   const tabla = calcularPosiciones(partidos, equipos);
+
+  const partidoIds = partidos.map((p: any) => p.id).filter(Boolean);
+  let goleadores: { jugador: string; club: string; goles: number }[] = [];
+  if (partidoIds.length > 0) {
+    const { data: goles } = await supabase
+      .from("goles")
+      .select("jugador, equipo_id")
+      .in("partido_id", partidoIds);
+
+    const nombreEquipo = new Map(equipos.map((e) => [e.id, e.nombre]));
+    const conteo = new Map<string, { jugador: string; club: string; goles: number }>();
+    for (const gol of goles ?? []) {
+      const key = `${gol.jugador}__${gol.equipo_id ?? ""}`;
+      const actual = conteo.get(key);
+      if (actual) {
+        actual.goles += 1;
+      } else {
+        conteo.set(key, {
+          jugador: gol.jugador,
+          club: nombreEquipo.get(gol.equipo_id ?? "") ?? "—",
+          goles: 1,
+        });
+      }
+    }
+    goleadores = Array.from(conteo.values())
+      .sort((a, b) => b.goles - a.goles)
+      .slice(0, 10);
+  }
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10 flex flex-col gap-6">
@@ -136,6 +164,49 @@ export default async function PosicionesZonaPage({
       ) : (
         <p className="text-neutral-500 text-sm">Todavía no hay equipos cargados en esta zona.</p>
       )}
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-celeste-oscuro">Goleadores</h2>
+        {goleadores.length > 0 ? (
+          <div className="overflow-x-auto rounded-xl border border-neutral-200 shadow-sm">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-celeste-oscuro text-white text-left">
+                  <th className="p-3 font-semibold">#</th>
+                  <th className="p-3 font-semibold">Jugador</th>
+                  <th className="p-3 font-semibold">Club</th>
+                  <th className="p-3 text-center font-bold text-dorado">Goles</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {goleadores.map((g, i) => (
+                  <tr
+                    key={`${g.jugador}-${i}`}
+                    className={`border-b border-neutral-100 last:border-0 ${
+                      i === 0 ? "bg-dorado/10" : "hover:bg-neutral-50"
+                    }`}
+                  >
+                    <td className="p-3">
+                      <span
+                        className={`w-6 h-6 inline-flex items-center justify-center rounded-full text-xs font-bold ${
+                          i === 0 ? "bg-dorado text-celeste-oscuro" : "text-neutral-500"
+                        }`}
+                      >
+                        {i + 1}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold text-celeste-oscuro">{g.jugador}</td>
+                    <td className="p-3 text-neutral-500">{g.club}</td>
+                    <td className="p-3 text-center font-extrabold text-celeste-oscuro">{g.goles}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-neutral-500 text-sm">Todavía no hay goles cargados en esta zona.</p>
+        )}
+      </section>
     </main>
   );
 }
