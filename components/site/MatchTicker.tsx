@@ -1,6 +1,19 @@
 import Link from "next/link";
 import { tituloTicker, type TickerPartido } from "@/lib/match-ticker";
 
+function formatearFecha(fecha: string | null) {
+  if (!fecha) return null;
+  // Se parsea manualmente (año-mes-día) para evitar corrimientos de huso horario.
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  const date = new Date(anio, mes - 1, dia);
+  const texto = date.toLocaleDateString("es-AR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  });
+  return texto.replace(".", "").replace(/^\w/, (c) => c.toUpperCase());
+}
+
 function EscudoClub({ nombre, logoUrl }: { nombre: string; logoUrl: string | null }) {
   if (logoUrl) {
     return (
@@ -16,10 +29,13 @@ function EscudoClub({ nombre, logoUrl }: { nombre: string; logoUrl: string | nul
 }
 
 function MatchCard({ partido }: { partido: TickerPartido }) {
+  const fechaTexto = formatearFecha(partido.fechaFecha);
+
   return (
     <div className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm">
-      <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
-        {partido.zona}
+      <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold text-center">
+        {partido.zona} · Fecha {partido.numeroFecha}
+        {fechaTexto ? ` · ${fechaTexto}` : ""}
       </span>
       <div className="flex items-center gap-2 w-full justify-center">
         <span className="flex items-center gap-1.5 flex-1 justify-end min-w-0">

@@ -28,7 +28,7 @@ export default async function Home() {
         const { data: fechas } = await supabase
           .from("fixture_fechas")
           .select(
-            `numero_fecha,
+            `numero_fecha, fecha,
              partidos (
                id, estado, hora, resultado_local, resultado_visitante, libre_equipo_id,
                equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
@@ -50,6 +50,8 @@ export default async function Home() {
         tickerPartidos.push({
           id: partido.id,
           zona: zona.nombre,
+          numeroFecha: (fechaActiva as any).numero_fecha,
+          fechaFecha: (fechaActiva as any).fecha,
           local: partido.equipo_local?.clubes?.nombre ?? "?",
           logoLocal: partido.equipo_local?.clubes?.logo_url ?? null,
           visitante: partido.equipo_visitante?.clubes?.nombre ?? "?",
