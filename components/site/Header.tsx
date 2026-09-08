@@ -24,7 +24,12 @@ export function Header() {
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-2 shrink-0">
+        <a
+          href="https://afacffa.com.ar/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden lg:flex items-center gap-2 shrink-0"
+        >
           <Image
             src="/consejo-federal.png"
             alt="Consejo Federal del Fútbol Argentino"
@@ -32,11 +37,16 @@ export function Header() {
             height={143}
             className="h-24 w-auto"
           />
-        </div>
+        </a>
 
-        <div className="hidden lg:flex items-center shrink-0">
+        <a
+          href="https://www.afa.com.ar/es/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden lg:flex items-center shrink-0"
+        >
           <Image src="/afa.svg" alt="Afiliado a AFA" width={512} height={512} className="h-16 w-auto" />
-        </div>
+        </a>
 
         <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
           {links.map((link) => (
