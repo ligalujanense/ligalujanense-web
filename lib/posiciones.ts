@@ -7,7 +7,19 @@ export type PartidoJugado = {
   numero_fecha: number;
 };
 
-export type EquipoNombre = { id: string; nombre: string };
+export type EquipoNombre = {
+  id: string;
+  nombre: string;
+  ajuste?: {
+    pj: number;
+    pg: number;
+    pe: number;
+    pp: number;
+    gf: number;
+    gc: number;
+    pts: number;
+  };
+};
 
 export type FilaPosiciones = {
   equipo_id: string;
@@ -29,17 +41,18 @@ export function calcularPosiciones(
   const tabla = new Map<string, FilaPosiciones>();
 
   for (const equipo of equipos) {
+    const ajuste = equipo.ajuste;
     tabla.set(equipo.id, {
       equipo_id: equipo.id,
       nombre: equipo.nombre,
-      pj: 0,
-      pg: 0,
-      pe: 0,
-      pp: 0,
-      gf: 0,
-      gc: 0,
+      pj: ajuste?.pj ?? 0,
+      pg: ajuste?.pg ?? 0,
+      pe: ajuste?.pe ?? 0,
+      pp: ajuste?.pp ?? 0,
+      gf: ajuste?.gf ?? 0,
+      gc: ajuste?.gc ?? 0,
       dg: 0,
-      pts: 0,
+      pts: ajuste?.pts ?? 0,
     });
   }
 

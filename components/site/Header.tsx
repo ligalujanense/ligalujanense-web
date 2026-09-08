@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { TorneosNavDropdown } from "./TorneosNavDropdown";
 
-const links = [
-  { href: "/noticias", label: "Noticias" },
-  { href: "/fixture", label: "Fixture" },
-  { href: "/posiciones", label: "Posiciones" },
+const linksAntes = [{ href: "/noticias", label: "Noticias" }];
+const linksDespues = [
   { href: "/clubes", label: "Clubes" },
   { href: "/institucional", label: "Institucional" },
 ];
@@ -49,7 +48,17 @@ export function Header() {
         </a>
 
         <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
-          {links.map((link) => (
+          {linksAntes.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="px-2.5 sm:px-3 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-celeste-oscuro/80 hover:text-dorado-oscuro transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <TorneosNavDropdown />
+          {linksDespues.map((link) => (
             <Link
               key={link.href}
               href={link.href}

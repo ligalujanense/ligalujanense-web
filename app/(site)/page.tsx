@@ -94,16 +94,10 @@ export default async function Home() {
               </p>
               <div className="flex flex-wrap gap-3 justify-center mt-2">
                 <Link
-                  href="/posiciones"
+                  href="/torneos/futbol-masculino"
                   className="bg-dorado hover:bg-dorado-claro text-celeste-oscuro font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
                 >
-                  Ver posiciones
-                </Link>
-                <Link
-                  href="/fixture"
-                  className="bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-2.5 rounded-full transition-colors border border-white/20"
-                >
-                  Ver fixture
+                  Ver torneos
                 </Link>
               </div>
             </div>

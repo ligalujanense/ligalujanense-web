@@ -46,6 +46,28 @@ export async function crearEquipo(formData: FormData) {
   revalidatePath("/fixture");
 }
 
+export async function actualizarAjusteInicial(id: string, formData: FormData) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const num = (key: string) => Number(formData.get(key) ?? 0) || 0;
+  const ajuste = {
+    ajuste_pj: num("ajuste_pj"),
+    ajuste_pg: num("ajuste_pg"),
+    ajuste_pe: num("ajuste_pe"),
+    ajuste_pp: num("ajuste_pp"),
+    ajuste_gf: num("ajuste_gf"),
+    ajuste_gc: num("ajuste_gc"),
+    ajuste_pts: num("ajuste_pts"),
+  };
+
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("equipos").update(ajuste).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/zonas");
+  revalidatePath("/posiciones");
+}
+
 export async function eliminarEquipo(id: string) {
   if (!(await isAdmin())) return { error: "No autorizado" };
 

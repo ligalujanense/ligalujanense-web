@@ -83,7 +83,7 @@ export function MatchTicker({ partidos }: { partidos: TickerPartido[] }) {
           {tituloTicker(partidos)}
         </span>
         <Link
-          href="/fixture"
+          href="/torneos/futbol-masculino"
           className="text-dorado-claro text-xs font-bold hover:underline justify-self-end"
         >
           Ver todo el fixture →
