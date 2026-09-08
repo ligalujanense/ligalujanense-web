@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { getUsuario } from "@/lib/supabase/auth";
+import { AdminSidebar } from "./AdminSidebar";
 
 const linksAdminGeneral = [
   { href: "/admin", label: "Inicio" },
@@ -30,19 +30,9 @@ export default async function AdminLayout({
   const links = usuario?.rol === "admin" ? linksAdminGeneral : linksEncargado;
 
   return (
-    <div className="min-h-screen bg-crema">
-      <header className="bg-dorado-oscuro text-white px-6 py-4 flex items-center justify-between flex-wrap gap-2">
-        <span className="font-bold">Panel — Liga Lujanense</span>
-        <span className="text-sm opacity-80">{usuario?.rol}</span>
-      </header>
-      <nav className="bg-white border-b border-neutral-200 px-6 py-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        {links.map((link) => (
-          <Link key={link.href} href={link.href} className="hover:text-dorado-oscuro">
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-      <main className="p-6">{children}</main>
+    <div className="min-h-screen bg-crema flex">
+      <AdminSidebar links={links} rol={usuario?.rol ?? ""} />
+      <main className="flex-1 p-6 min-w-0">{children}</main>
     </div>
   );
 }

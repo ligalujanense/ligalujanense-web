@@ -39,6 +39,44 @@ export async function crearNoticia(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function actualizarNoticia(id: string, formData: FormData) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const titulo = String(formData.get("titulo") ?? "").trim();
+  const resumen = String(formData.get("resumen") ?? "").trim();
+  const contenido = String(formData.get("contenido") ?? "").trim();
+  const imagen_url = String(formData.get("imagen_url") ?? "").trim();
+  if (!titulo) return { error: "Falta el título" };
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("noticias")
+    .update({
+      titulo,
+      resumen: resumen || null,
+      contenido: contenido || null,
+      imagen_url: imagen_url || null,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/noticias");
+  revalidatePath("/noticias");
+  revalidatePath("/");
+}
+
+export async function alternarPublicado(id: string, publicado: boolean) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("noticias").update({ publicado }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/noticias");
+  revalidatePath("/noticias");
+  revalidatePath("/");
+}
+
 export async function eliminarNoticia(id: string) {
   if (!(await isAdmin())) return { error: "No autorizado" };
 
