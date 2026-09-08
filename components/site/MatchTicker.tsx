@@ -77,11 +77,15 @@ export function MatchTicker({ partidos }: { partidos: TickerPartido[] }) {
 
   return (
     <section className="bg-celeste-oscuro py-4 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between mb-3">
-        <span className="text-white font-bold uppercase text-xs tracking-widest">
+      <div className="max-w-6xl mx-auto px-4 grid grid-cols-[1fr_auto_1fr] items-center mb-3 gap-2">
+        <span />
+        <span className="text-white font-bold uppercase text-xs tracking-widest text-center">
           {tituloTicker(partidos)}
         </span>
-        <Link href="/fixture" className="text-dorado-claro text-xs font-bold hover:underline">
+        <Link
+          href="/fixture"
+          className="text-dorado-claro text-xs font-bold hover:underline justify-self-end"
+        >
           Ver todo el fixture →
         </Link>
       </div>
