@@ -12,11 +12,13 @@ const linksAdminGeneral = [
   { href: "/admin/sponsors", label: "Sponsors" },
   { href: "/admin/institucional", label: "Institucional" },
   { href: "/admin/autoridades", label: "Autoridades" },
+  { href: "/admin/cuenta", label: "Mi cuenta" },
 ];
 
 const linksEncargado = [
   { href: "/admin", label: "Inicio" },
   { href: "/admin/fixture", label: "Fixture" },
+  { href: "/admin/cuenta", label: "Mi cuenta" },
 ];
 
 export default async function AdminLayout({

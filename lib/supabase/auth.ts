@@ -4,8 +4,10 @@ export type Rol = "admin" | "encargado_zona";
 
 export type Usuario = {
   id: string;
+  email: string;
   rol: Rol;
   zona_id: string | null;
+  nombre: string | null;
 };
 
 export async function getUser() {
@@ -23,7 +25,7 @@ export async function getUsuario(): Promise<Usuario | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("usuarios")
-    .select("id, rol, zona_id")
+    .select("id, email, rol, zona_id, nombre")
     .eq("id", user.id)
     .single();
 
