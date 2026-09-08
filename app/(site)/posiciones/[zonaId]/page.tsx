@@ -1,13 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { calcularPosiciones, calcularUltimosResultados } from "@/lib/posiciones";
+import { calcularPosiciones } from "@/lib/posiciones";
 import { ShareButtons } from "@/components/site/ShareButtons";
-
-const COLOR_RESULTADO: Record<string, string> = {
-  V: "bg-green-600",
-  E: "bg-neutral-400",
-  D: "bg-red-600",
-};
 
 export default async function PosicionesZonaPage({
   params,
@@ -110,12 +104,10 @@ export default async function PosicionesZonaPage({
                 <th className="p-3 text-center font-semibold">GC</th>
                 <th className="p-3 text-center font-semibold">DG</th>
                 <th className="p-3 text-center font-bold text-dorado">Pts</th>
-                <th className="p-3 text-center font-semibold">Últimos 5</th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {tabla.map((fila, i) => {
-                const ultimos = calcularUltimosResultados(partidos, fila.equipo_id);
                 return (
                   <tr
                     key={fila.equipo_id}
@@ -157,22 +149,6 @@ export default async function PosicionesZonaPage({
                     <td className="p-3 text-center">{fila.gc}</td>
                     <td className="p-3 text-center">{fila.dg}</td>
                     <td className="p-3 text-center font-extrabold text-celeste-oscuro">{fila.pts}</td>
-                    <td className="p-3">
-                      <div className="flex items-center justify-center gap-1">
-                        {ultimos.length > 0 ? (
-                          ultimos.map((resultado, idx) => (
-                            <span
-                              key={idx}
-                              className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white ${COLOR_RESULTADO[resultado]}`}
-                            >
-                              {resultado}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-neutral-300 text-xs">—</span>
-                        )}
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
