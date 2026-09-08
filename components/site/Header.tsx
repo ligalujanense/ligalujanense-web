@@ -23,6 +23,18 @@ export function Header() {
             de Fútbol
           </span>
         </Link>
+
+        <div className="hidden md:flex items-center gap-4 shrink-0">
+          <Image src="/afa.png" alt="Afiliado a AFA" width={36} height={45} className="h-10 w-auto" />
+          <Image
+            src="/consejo-federal.png"
+            alt="Consejo Federal"
+            width={40}
+            height={40}
+            className="h-9 w-9 rounded-full"
+          />
+        </div>
+
         <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
           {links.map((link) => (
             <Link
