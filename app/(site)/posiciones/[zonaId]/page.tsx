@@ -27,13 +27,15 @@ export default async function PosicionesZonaPage({
 
   const { data: equiposRaw } = await supabase
     .from("equipos")
-    .select("id, clubes ( nombre )")
+    .select("id, clubes ( nombre, logo_url )")
     .eq("zona_id", zonaId);
 
   const equipos = (equiposRaw ?? []).map((equipo: any) => ({
     id: equipo.id,
     nombre: equipo.clubes?.nombre ?? "Equipo",
+    logoUrl: equipo.clubes?.logo_url ?? null,
   }));
+  const logoPorEquipo = new Map(equipos.map((e) => [e.id, e.logoUrl]));
 
   const { data: fechas } = await supabase
     .from("fixture_fechas")
@@ -130,7 +132,23 @@ export default async function PosicionesZonaPage({
                         {i + 1}
                       </span>
                     </td>
-                    <td className="p-3 font-semibold text-celeste-oscuro">{fila.nombre}</td>
+                    <td className="p-3 font-semibold text-celeste-oscuro">
+                      <div className="flex items-center gap-2">
+                        {logoPorEquipo.get(fila.equipo_id) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={logoPorEquipo.get(fila.equipo_id)!}
+                            alt=""
+                            className="w-6 h-6 object-contain shrink-0"
+                          />
+                        ) : (
+                          <span className="w-6 h-6 rounded-full bg-celeste-oscuro/10 text-celeste-oscuro flex items-center justify-center text-[10px] font-bold shrink-0">
+                            {fila.nombre.charAt(0)}
+                          </span>
+                        )}
+                        {fila.nombre}
+                      </div>
+                    </td>
                     <td className="p-3 text-center">{fila.pj}</td>
                     <td className="p-3 text-center">{fila.pg}</td>
                     <td className="p-3 text-center">{fila.pe}</td>
