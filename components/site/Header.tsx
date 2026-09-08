@@ -30,7 +30,7 @@ export function Header() {
             alt="Consejo Federal del Fútbol Argentino"
             width={306}
             height={143}
-            className="h-12 w-auto"
+            className="h-24 w-auto"
           />
         </div>
 
