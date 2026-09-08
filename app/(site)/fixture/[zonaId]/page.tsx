@@ -79,7 +79,7 @@ export default async function FixtureZonaPage({
                       >
                         {partido.estado === "jugado"
                           ? `${partido.resultado_local} - ${partido.resultado_visitante}`
-                          : partido.hora ?? "A definir"}
+                          : partido.hora?.slice(0, 5) ?? "A definir"}
                       </span>
                       <span className="font-semibold text-celeste-oscuro text-sm flex-1">
                         {partido.equipo_visitante?.clubes?.nombre ?? "?"}

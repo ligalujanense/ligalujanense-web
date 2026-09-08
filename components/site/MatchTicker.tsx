@@ -32,7 +32,10 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
   const fechaTexto = formatearFecha(partido.fechaFecha);
 
   return (
-    <div className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm">
+    <Link
+      href={`/partidos/${partido.id}`}
+      className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+    >
       <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold text-center">
         {partido.zona} · Fecha {partido.numeroFecha}
         {fechaTexto ? ` · ${fechaTexto}` : ""}
@@ -53,7 +56,7 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
         >
           {partido.estado === "jugado"
             ? `${partido.resultado_local} - ${partido.resultado_visitante}`
-            : partido.hora ?? "A definir"}
+            : partido.hora?.slice(0, 5) ?? "A definir"}
         </span>
         <span className="flex items-center gap-1.5 flex-1 min-w-0">
           <EscudoClub nombre={partido.visitante} logoUrl={partido.logoVisitante} />
@@ -62,7 +65,7 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
           </span>
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
