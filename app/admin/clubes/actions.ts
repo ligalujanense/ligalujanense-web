@@ -11,6 +11,7 @@ export async function crearClub(formData: FormData) {
   const direccion = String(formData.get("direccion") ?? "").trim();
   const contacto = String(formData.get("contacto") ?? "").trim();
   const logo_url = String(formData.get("logo_url") ?? "").trim();
+  const link = String(formData.get("link") ?? "").trim();
   if (!nombre) return { error: "Falta el nombre" };
 
   const supabase = createAdminClient();
@@ -19,6 +20,7 @@ export async function crearClub(formData: FormData) {
     direccion: direccion || null,
     contacto: contacto || null,
     logo_url: logo_url || null,
+    link: link || null,
   });
   if (error) return { error: error.message };
 
@@ -33,6 +35,7 @@ export async function actualizarClub(id: string, formData: FormData) {
   const direccion = String(formData.get("direccion") ?? "").trim();
   const contacto = String(formData.get("contacto") ?? "").trim();
   const logo_url = String(formData.get("logo_url") ?? "").trim();
+  const link = String(formData.get("link") ?? "").trim();
   if (!nombre) return { error: "Falta el nombre" };
 
   const supabase = createAdminClient();
@@ -43,6 +46,7 @@ export async function actualizarClub(id: string, formData: FormData) {
       direccion: direccion || null,
       contacto: contacto || null,
       logo_url: logo_url || null,
+      link: link || null,
     })
     .eq("id", id);
   if (error) return { error: error.message };

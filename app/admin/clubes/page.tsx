@@ -5,7 +5,7 @@ export default async function ClubesAdminPage() {
   const supabase = createAdminClient();
   const { data: clubes } = await supabase
     .from("clubes")
-    .select("id, nombre, direccion, contacto, logo_url")
+    .select("id, nombre, direccion, contacto, logo_url, link")
     .order("nombre");
 
   return (

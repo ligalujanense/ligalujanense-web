@@ -10,6 +10,7 @@ type Club = {
   direccion: string | null;
   contacto: string | null;
   logo_url: string | null;
+  link: string | null;
 };
 
 export function ClubesAdminList({ clubes }: { clubes: Club[] }) {
@@ -42,6 +43,15 @@ export function ClubesAdminList({ clubes }: { clubes: Club[] }) {
         <label className="flex flex-col gap-1 text-sm">
           Logo
           <ImageUploader pathPrefix="clubes" onUploaded={setLogoUrl} onUploadingChange={setLogoUploading} />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Link (web o Instagram)
+          <input
+            name="link"
+            type="url"
+            placeholder="https://instagram.com/miclub"
+            className="border border-neutral-300 rounded px-3 py-2"
+          />
         </label>
         <button
           type="submit"
@@ -156,6 +166,16 @@ function ClubEditForm({
             currentUrl={club.logo_url}
             onUploaded={setLogoUrl}
             onUploadingChange={setLogoUploading}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Link (web o Instagram)
+          <input
+            name="link"
+            type="url"
+            defaultValue={club.link ?? ""}
+            placeholder="https://instagram.com/miclub"
+            className="border border-neutral-300 rounded px-3 py-2"
           />
         </label>
         <div className="flex gap-2">

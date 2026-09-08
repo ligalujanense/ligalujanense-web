@@ -4,7 +4,7 @@ export default async function ClubesPage() {
   const supabase = await createClient();
   const { data: clubes } = await supabase
     .from("clubes")
-    .select("id, nombre, logo_url, direccion")
+    .select("id, nombre, logo_url, direccion, link")
     .order("nombre");
 
   return (
@@ -20,31 +20,37 @@ export default async function ClubesPage() {
 
       {clubes && clubes.length > 0 ? (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {clubes.map((club) => (
-            <div
-              key={club.id}
-              className="bg-white border border-neutral-200 rounded-xl p-5 flex flex-col items-center text-center gap-3 hover:border-dorado hover:shadow-md transition-all"
-            >
-              {club.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={club.logo_url}
-                  alt={club.nombre}
-                  className="w-16 h-16 object-contain"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-celeste-oscuro flex items-center justify-center text-dorado font-black text-xl">
-                  {club.nombre.charAt(0)}
-                </div>
-              )}
-              <div>
-                <p className="font-bold text-celeste-oscuro">{club.nombre}</p>
-                {club.direccion && (
-                  <p className="text-sm text-neutral-500">{club.direccion}</p>
+          {clubes.map((club) => {
+            const Card = club.link ? "a" : "div";
+            return (
+              <Card
+                key={club.id}
+                {...(club.link
+                  ? { href: club.link, target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="bg-white border border-neutral-200 rounded-xl p-5 flex flex-col items-center text-center gap-3 hover:border-dorado hover:shadow-md transition-all"
+              >
+                {club.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={club.logo_url}
+                    alt={club.nombre}
+                    className="w-16 h-16 object-contain"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-celeste-oscuro flex items-center justify-center text-dorado font-black text-xl">
+                    {club.nombre.charAt(0)}
+                  </div>
                 )}
-              </div>
-            </div>
-          ))}
+                <div>
+                  <p className="font-bold text-celeste-oscuro">{club.nombre}</p>
+                  {club.direccion && (
+                    <p className="text-sm text-neutral-500">{club.direccion}</p>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <p className="text-neutral-500 text-sm">Todavía no hay clubes cargados.</p>
