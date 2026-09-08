@@ -73,7 +73,7 @@ export function MatchTicker({ partidos }: { partidos: TickerPartido[] }) {
   if (partidos.length === 0) return null;
 
   // Duplicamos la lista para que el loop de la cinta sea continuo (sin salto visible).
-  const duracion = Math.max(partidos.length * 3, 18);
+  const duracion = Math.max(partidos.length * 6, 36);
 
   return (
     <section className="bg-celeste-oscuro py-4 overflow-hidden">
@@ -92,7 +92,7 @@ export function MatchTicker({ partidos }: { partidos: TickerPartido[] }) {
 
       <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
         <div
-          className="flex gap-3 w-max motion-safe:animate-[marquee_var(--duration)_linear_infinite]"
+          className="flex gap-3 w-max motion-safe:animate-[marquee_var(--duration)_linear_infinite] hover:[animation-play-state:paused]"
           style={{ ["--duration" as string]: `${duracion}s` }}
         >
           {[...partidos, ...partidos].map((partido, i) => (
