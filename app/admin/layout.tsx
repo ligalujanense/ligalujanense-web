@@ -3,9 +3,8 @@ import { AdminSidebar } from "./AdminSidebar";
 
 const linksAdminGeneral = [
   { href: "/admin", label: "Inicio" },
-  { href: "/admin/zonas", label: "Zonas" },
+  { href: "/admin/zonas", label: "Zonas y equipos" },
   { href: "/admin/clubes", label: "Clubes" },
-  { href: "/admin/equipos", label: "Equipos" },
   { href: "/admin/fixture", label: "Fixture" },
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/noticias", label: "Noticias" },
