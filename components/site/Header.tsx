@@ -13,10 +13,10 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-white">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <Link href="/" className="shrink-0 flex items-center gap-3">
-          <span className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-dorado p-1.5 shrink-0">
+          <span className="flex items-center justify-center w-20 h-20 rounded-full border-2 border-dorado p-2 shrink-0">
             <Image src="/logo.png" alt="Liga Lujanense" width={44} height={49} className="w-full h-auto" priority />
           </span>
-          <span className="hidden sm:block font-extrabold text-celeste-oscuro leading-tight text-sm tracking-tight">
+          <span className="hidden sm:block font-extrabold text-celeste-oscuro leading-tight text-base tracking-tight">
             Liga Lujanense
             <br />
             de Fútbol
@@ -27,14 +27,14 @@ export function Header() {
           href="https://afacffa.com.ar/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-2 shrink-0"
+          className="hidden lg:flex items-center gap-2 shrink-0 opacity-80 hover:opacity-100 transition-opacity"
         >
           <Image
             src="/consejo-federal.png"
             alt="Consejo Federal del Fútbol Argentino"
             width={306}
             height={143}
-            className="h-24 w-auto"
+            className="h-12 w-auto"
           />
         </a>
 
@@ -42,9 +42,9 @@ export function Header() {
           href="https://www.afa.com.ar/es/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden lg:flex items-center shrink-0"
+          className="hidden lg:flex items-center shrink-0 opacity-80 hover:opacity-100 transition-opacity"
         >
-          <Image src="/afa.svg" alt="Afiliado a AFA" width={512} height={512} className="h-16 w-auto" />
+          <Image src="/afa.svg" alt="Afiliado a AFA" width={512} height={512} className="h-9 w-auto" />
         </a>
 
         <nav className="flex flex-wrap items-center gap-x-1 sm:gap-x-2">
