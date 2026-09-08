@@ -51,6 +51,37 @@ export async function crearPartido(zonaId: string, formData: FormData) {
   revalidatePath("/fixture");
 }
 
+export async function editarPartido(zonaId: string, id: string, formData: FormData) {
+  if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
+
+  const equipo_local_id = String(formData.get("equipo_local_id") ?? "") || null;
+  const equipo_visitante_id = String(formData.get("equipo_visitante_id") ?? "") || null;
+  const libre_equipo_id = String(formData.get("libre_equipo_id") ?? "") || null;
+  const hora = String(formData.get("hora") ?? "") || null;
+  const estadio = String(formData.get("estadio") ?? "") || null;
+
+  if (!libre_equipo_id && (!equipo_local_id || !equipo_visitante_id)) {
+    return { error: "Elegí local y visitante, o el equipo libre" };
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("partidos")
+    .update({
+      equipo_local_id: libre_equipo_id ? null : equipo_local_id,
+      equipo_visitante_id: libre_equipo_id ? null : equipo_visitante_id,
+      libre_equipo_id,
+      hora,
+      estadio,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/admin/fixture/${zonaId}`);
+  revalidatePath("/fixture");
+  revalidatePath(`/partidos/${id}`);
+}
+
 export async function eliminarFecha(zonaId: string, id: string) {
   if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
 

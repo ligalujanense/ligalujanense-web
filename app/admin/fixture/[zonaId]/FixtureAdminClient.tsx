@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useTransition } from "react";
-import { crearFecha, crearPartido, eliminarFecha, eliminarPartido } from "./actions";
+import { useState, useTransition } from "react";
+import { crearFecha, crearPartido, editarPartido, eliminarFecha, eliminarPartido } from "./actions";
 
 type Equipo = { id: string; nombre: string };
 type Partido = {
@@ -18,6 +18,96 @@ type Partido = {
 };
 type Fecha = { id: string; numero_fecha: number; fecha: string | null; partidos: Partido[] };
 
+function EditarPartidoForm({
+  zonaId,
+  partido,
+  equipos,
+  onGuardado,
+}: {
+  zonaId: string;
+  partido: Partido;
+  equipos: Equipo[];
+  onGuardado: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <form
+      action={(formData) =>
+        startTransition(() => {
+          editarPartido(zonaId, partido.id, formData);
+          onGuardado();
+        })
+      }
+      className="flex flex-wrap items-end gap-2 text-sm bg-neutral-50 border border-neutral-100 rounded px-3 py-2"
+    >
+      <label className="flex flex-col gap-1">
+        Local
+        <select
+          name="equipo_local_id"
+          defaultValue={partido.equipo_local_id ?? ""}
+          className="border border-neutral-300 rounded px-2 py-1"
+        >
+          <option value="">—</option>
+          {equipos.map((e) => (
+            <option key={e.id} value={e.id}>{e.nombre}</option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        Visitante
+        <select
+          name="equipo_visitante_id"
+          defaultValue={partido.equipo_visitante_id ?? ""}
+          className="border border-neutral-300 rounded px-2 py-1"
+        >
+          <option value="">—</option>
+          {equipos.map((e) => (
+            <option key={e.id} value={e.id}>{e.nombre}</option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        Hora
+        <input
+          type="time"
+          name="hora"
+          defaultValue={partido.hora ? partido.hora.slice(0, 5) : ""}
+          className="border border-neutral-300 rounded px-2 py-1"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        Estadio
+        <input
+          name="estadio"
+          defaultValue={partido.estadio ?? ""}
+          className="border border-neutral-300 rounded px-2 py-1"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        O libre
+        <select
+          name="libre_equipo_id"
+          defaultValue={partido.libre_equipo_id ?? ""}
+          className="border border-neutral-300 rounded px-2 py-1"
+        >
+          <option value="">—</option>
+          {equipos.map((e) => (
+            <option key={e.id} value={e.id}>{e.nombre}</option>
+          ))}
+        </select>
+      </label>
+      <button
+        type="submit"
+        disabled={isPending}
+        className="bg-celeste-oscuro hover:bg-celeste text-white rounded px-3 py-1.5 disabled:opacity-50"
+      >
+        Guardar
+      </button>
+    </form>
+  );
+}
+
 export function FixtureAdminClient({
   zonaId,
   fechas,
@@ -28,6 +118,7 @@ export function FixtureAdminClient({
   equipos: Equipo[];
 }) {
   const [isPending, startTransition] = useTransition();
+  const [partidoEditando, setPartidoEditando] = useState<string | null>(null);
   const nombreEquipo = (id: string | null) =>
     equipos.find((e) => e.id === id)?.nombre ?? "?";
 
@@ -129,24 +220,44 @@ export function FixtureAdminClient({
               {fecha.partidos.map((partido) => (
                 <li
                   key={partido.id}
-                  className="flex items-center justify-between text-sm border border-neutral-100 rounded px-3 py-1.5"
+                  className="flex flex-col gap-2 text-sm border border-neutral-100 rounded px-3 py-1.5"
                 >
-                  {partido.libre_equipo_id ? (
-                    <span>{nombreEquipo(partido.libre_equipo_id)} — libre</span>
-                  ) : (
-                    <Link href={`/admin/partidos/${partido.id}`} className="hover:text-dorado-oscuro">
-                      {nombreEquipo(partido.equipo_local_id)} vs {nombreEquipo(partido.equipo_visitante_id)}
-                      {partido.estado === "jugado" && (
-                        <> — {partido.resultado_local} a {partido.resultado_visitante}</>
-                      )}
-                    </Link>
+                  <div className="flex items-center justify-between">
+                    {partido.libre_equipo_id ? (
+                      <span>{nombreEquipo(partido.libre_equipo_id)} — libre</span>
+                    ) : (
+                      <Link href={`/admin/partidos/${partido.id}`} className="hover:text-dorado-oscuro">
+                        {nombreEquipo(partido.equipo_local_id)} vs {nombreEquipo(partido.equipo_visitante_id)}
+                        {partido.estado === "jugado" && (
+                          <> — {partido.resultado_local} a {partido.resultado_visitante}</>
+                        )}
+                      </Link>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          setPartidoEditando(partidoEditando === partido.id ? null : partido.id)
+                        }
+                        className="text-celeste-oscuro text-xs hover:underline"
+                      >
+                        {partidoEditando === partido.id ? "Cerrar edición" : "Editar"}
+                      </button>
+                      <button
+                        onClick={() => startTransition(() => { eliminarPartido(zonaId, partido.id); })}
+                        className="text-red-600 text-xs hover:underline"
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  </div>
+                  {partidoEditando === partido.id && (
+                    <EditarPartidoForm
+                      zonaId={zonaId}
+                      partido={partido}
+                      equipos={equipos}
+                      onGuardado={() => setPartidoEditando(null)}
+                    />
                   )}
-                  <button
-                    onClick={() => startTransition(() => { eliminarPartido(zonaId, partido.id); })}
-                    className="text-red-600 text-xs hover:underline"
-                  >
-                    Quitar
-                  </button>
                 </li>
               ))}
               {fecha.partidos.length === 0 && (
