@@ -108,26 +108,6 @@ export default async function Home() {
       <MatchTicker partidos={tickerPartidos} />
 
       <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col gap-14 w-full">
-        {zonas && zonas.length > 0 && (
-          <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-celeste-oscuro">Zonas</h2>
-            <div className="flex flex-wrap gap-3">
-              {zonas.map((zona) => (
-                <Link
-                  key={zona.id}
-                  href={`/posiciones/${zona.id}`}
-                  className="group bg-white border border-neutral-200 rounded-xl px-5 py-4 hover:border-dorado hover:shadow-md transition-all min-w-[160px]"
-                >
-                  <p className="font-bold text-celeste-oscuro group-hover:text-dorado-oscuro transition-colors">
-                    {zona.nombre}
-                  </p>
-                  <p className="text-sm text-neutral-500">{zona.temporada}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-celeste-oscuro">Últimas noticias</h2>
