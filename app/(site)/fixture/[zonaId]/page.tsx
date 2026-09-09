@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { FechaCard, type PartidoFechaCard } from "@/components/site/FechaCard";
 
 export default async function FixtureZonaPage({
   params,
@@ -23,17 +24,17 @@ export default async function FixtureZonaPage({
       `id, numero_fecha, fecha,
        partidos (
          id, hora, estadio, estado, resultado_local, resultado_visitante,
-         equipo_local:equipo_local_id ( id, clubes ( nombre ) ),
-         equipo_visitante:equipo_visitante_id ( id, clubes ( nombre ) ),
-         libre_equipo:libre_equipo_id ( id, clubes ( nombre ) )
+         equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
+         equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) ),
+         libre_equipo:libre_equipo_id ( clubes ( nombre ) )
        )`
     )
     .eq("zona_id", zonaId)
     .order("numero_fecha");
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10 flex flex-col gap-8">
-      <div>
+    <main className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-8">
+      <div className="text-center">
         <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
           Fixture
         </span>
@@ -44,58 +45,48 @@ export default async function FixtureZonaPage({
       </div>
 
       {fechas && fechas.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          {fechas.map((fecha: any) => (
-            <section key={fecha.id} className="flex flex-col gap-3">
-              <h2 className="font-bold text-celeste-oscuro flex items-center gap-2">
-                <span className="bg-celeste-oscuro text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                  Fecha {fecha.numero_fecha}
-                </span>
-                {fecha.fecha && <span className="text-neutral-500 text-sm font-normal">{fecha.fecha}</span>}
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {fecha.partidos?.map((partido: any) =>
-                  partido.libre_equipo ? (
-                    <div
-                      key={partido.id}
-                      className="border border-dashed border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-500 flex items-center justify-center"
-                    >
-                      {partido.libre_equipo.clubes?.nombre ?? "?"} — libre
-                    </div>
-                  ) : (
-                    <div
-                      key={partido.id}
-                      className="bg-white border border-neutral-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 hover:border-dorado transition-colors"
-                    >
-                      <span className="font-semibold text-celeste-oscuro text-sm text-right flex-1">
-                        {partido.equipo_local?.clubes?.nombre ?? "?"}
-                      </span>
-                      <span
-                        className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold ${
-                          partido.estado === "jugado"
-                            ? "bg-celeste-oscuro text-white"
-                            : "bg-dorado/15 text-dorado-oscuro"
-                        }`}
-                      >
-                        {partido.estado === "jugado"
-                          ? `${partido.resultado_local} - ${partido.resultado_visitante}`
-                          : partido.hora?.slice(0, 5) ?? "A definir"}
-                      </span>
-                      <span className="font-semibold text-celeste-oscuro text-sm flex-1">
-                        {partido.equipo_visitante?.clubes?.nombre ?? "?"}
-                      </span>
-                    </div>
-                  )
-                )}
-                {fecha.partidos?.length === 0 && (
-                  <p className="text-neutral-400 text-sm">Sin partidos cargados.</p>
-                )}
-              </div>
-            </section>
-          ))}
+        <div className="flex flex-col gap-10">
+          {fechas.map((fecha: any) => {
+            const fechaTexto: string | null = fecha.fecha
+              ? new Date(
+                  Number(fecha.fecha.slice(0, 4)),
+                  Number(fecha.fecha.slice(5, 7)) - 1,
+                  Number(fecha.fecha.slice(8, 10))
+                ).toLocaleDateString("es-AR", { weekday: "long", day: "2-digit", month: "long" })
+              : null;
+
+            const partidos: PartidoFechaCard[] = (fecha.partidos ?? []).map((partido: any) => ({
+              id: partido.id,
+              hora: partido.hora,
+              estadio: partido.estadio,
+              estado: partido.estado,
+              resultado_local: partido.resultado_local,
+              resultado_visitante: partido.resultado_visitante,
+              local: partido.equipo_local?.clubes
+                ? { nombre: partido.equipo_local.clubes.nombre, logoUrl: partido.equipo_local.clubes.logo_url }
+                : null,
+              visitante: partido.equipo_visitante?.clubes
+                ? { nombre: partido.equipo_visitante.clubes.nombre, logoUrl: partido.equipo_visitante.clubes.logo_url }
+                : null,
+              libreNombre: partido.libre_equipo?.clubes?.nombre ?? null,
+            }));
+
+            return (
+              <FechaCard
+                key={fecha.id}
+                zonaNombre={zona.nombre}
+                numeroFecha={fecha.numero_fecha}
+                fechaTexto={fechaTexto}
+                partidos={partidos}
+                path={`/fechas/${fecha.id}`}
+              />
+            );
+          })}
         </div>
       ) : (
-        <p className="text-neutral-500 text-sm">Todavía no hay fixture cargado para esta zona.</p>
+        <p className="text-neutral-500 text-sm text-center">
+          Todavía no hay fixture cargado para esta zona.
+        </p>
       )}
     </main>
   );
