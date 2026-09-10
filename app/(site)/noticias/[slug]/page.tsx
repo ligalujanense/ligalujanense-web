@@ -30,6 +30,7 @@ export default async function NoticiaDetallePage({
           endpoint={`/api/noticia-imagen/${slug}`}
           titulo={noticia.titulo}
           nombreBase={noticia.titulo}
+          cacheBust={false}
         />
         <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
       </div>

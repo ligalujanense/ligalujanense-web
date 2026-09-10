@@ -11,20 +11,35 @@ export function CompartirImagenButton({
   endpoint,
   titulo,
   nombreBase,
+  cacheBust = true,
 }: {
   endpoint: string;
   titulo: string;
   nombreBase: string;
+  /** true: pide siempre la imagen fresca (para datos que cambian, ej. fixture).
+   *  false: deja que Cloudflare la cachee (para contenido estable, ej. noticias). */
+  cacheBust?: boolean;
 }) {
   const [estado, setEstado] = useState<"idle" | "cargando" | "error">("idle");
+
+  async function pedirImagen(): Promise<Blob> {
+    const url = cacheBust
+      ? `${endpoint}${endpoint.includes("?") ? "&" : "?"}t=${Date.now()}`
+      : endpoint;
+    // El generador de imágenes puede devolver 503 puntualmente por límite de
+    // CPU del Worker; se reintenta un par de veces con una pausa corta.
+    for (let intento = 0; intento < 3; intento++) {
+      const res = await fetch(url);
+      if (res.ok) return res.blob();
+      if (intento < 2) await new Promise((r) => setTimeout(r, 1600));
+    }
+    throw new Error("No se pudo generar la imagen");
+  }
 
   async function compartir() {
     setEstado("cargando");
     try {
-      const sep = endpoint.includes("?") ? "&" : "?";
-      const res = await fetch(`${endpoint}${sep}t=${Date.now()}`);
-      if (!res.ok) throw new Error("No se pudo generar la imagen");
-      const blob = await res.blob();
+      const blob = await pedirImagen();
       const nombreArchivo = `${nombreBase.replace(/[^\w\s-]/g, "").trim() || "imagen"}.png`;
       const file = new File([blob], nombreArchivo, { type: "image/png" });
 

@@ -5,15 +5,15 @@ import { LIGA_LOGO } from "@/lib/baked-assets.generated";
 const OSCURO = "#0d1b24";
 const DORADO = "#D9A441";
 
-// A diferencia de los sponsors/escudos (que van horneados), la foto de la
-// noticia es dinámica: se trae acá en tiempo de ejecución. El fetch es a
-// Supabase Storage (host externo), no al propio worker, así que no cuelga.
+const ALTO_FOTO = 1040; // la foto ocupa solo la franja superior (rasterizar la
+// imagen completa a 1080x1920 supera el límite de CPU del Worker).
+
 async function imagenADataUri(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.byteLength > 2_600_000) return null;
+    if (buf.byteLength > 1_600_000) return null;
     const ct = res.headers.get("content-type") ?? "image/jpeg";
     return `data:${ct};base64,${buf.toString("base64")}`;
   } catch {
@@ -51,71 +51,78 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          position: "relative",
           background: OSCURO,
         }}
       >
-        {fondo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={fondo}
-            width={1080}
-            height={1920}
-            style={{ position: "absolute", inset: 0, objectFit: "cover" }}
-            alt=""
-          />
-        )}
+        {/* Franja superior: foto (o color de marca si no hay) */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
+            width: 1080,
+            height: ALTO_FOTO,
             display: "flex",
-            background:
-              "linear-gradient(to top, rgba(13,27,36,0.97) 0%, rgba(13,27,36,0.35) 48%, rgba(13,27,36,0.72) 100%)",
-          }}
-        />
-
-        {/* Encabezado */}
-        <div
-          style={{
-            position: "absolute",
-            top: 64,
-            left: 60,
-            right: 60,
-            display: "flex",
-            alignItems: "center",
+            position: "relative",
+            background: "#123043",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={LIGA_LOGO}
-            width={78}
-            height={86}
-            style={{ objectFit: "contain", marginRight: 20 }}
-            alt=""
-          />
-          <span
+          {fondo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={fondo}
+              width={1080}
+              height={ALTO_FOTO}
+              style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+              alt=""
+            />
+          )}
+          <div
             style={{
-              color: "#ffffff",
-              fontSize: 30,
-              fontWeight: 700,
-              letterSpacing: 3,
-              textTransform: "uppercase",
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              background:
+                "linear-gradient(to bottom, rgba(13,27,36,0.55) 0%, rgba(13,27,36,0) 30%, rgba(13,27,36,0) 70%, rgba(13,27,36,1) 100%)",
+            }}
+          />
+          {/* Encabezado */}
+          <div
+            style={{
+              position: "absolute",
+              top: 60,
+              left: 60,
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            Liga Lujanense
-          </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={LIGA_LOGO}
+              width={78}
+              height={86}
+              style={{ objectFit: "contain", marginRight: 20 }}
+              alt=""
+            />
+            <span
+              style={{
+                color: "#ffffff",
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+              }}
+            >
+              Liga Lujanense
+            </span>
+          </div>
         </div>
 
-        {/* Contenido */}
+        {/* Panel inferior con el texto */}
         <div
           style={{
-            position: "absolute",
-            bottom: 110,
-            left: 60,
-            right: 60,
+            flex: 1,
             display: "flex",
             flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 64px",
           }}
         >
           <div style={{ display: "flex" }}>
@@ -137,19 +144,19 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
           <span
             style={{
               color: "#ffffff",
-              fontSize: 78,
+              fontSize: 74,
               fontWeight: 800,
-              lineHeight: 1.08,
-              marginTop: 28,
+              lineHeight: 1.1,
+              marginTop: 30,
             }}
           >
             {titulo}
           </span>
           <span
             style={{
-              color: "rgba(255,255,255,0.62)",
+              color: "rgba(255,255,255,0.6)",
               fontSize: 31,
-              marginTop: 22,
+              marginTop: 24,
               textTransform: "capitalize",
             }}
           >
@@ -161,7 +168,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
     {
       width: 1080,
       height: 1920,
-      headers: { "Cache-Control": "public, max-age=60, s-maxage=60" },
+      headers: {
+        // Contenido estable por noticia → se cachea fuerte en el borde: la
+        // primera generación exitosa queda servida al instante para todos.
+        "Cache-Control": "public, max-age=300, s-maxage=604800",
+      },
     }
   );
 }

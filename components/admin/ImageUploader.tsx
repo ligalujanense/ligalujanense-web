@@ -74,7 +74,10 @@ export function ImageUploader({
     setError(null);
 
     try {
-      const procesada = await redimensionar(file);
+      // Las fotos de noticias se usan también como fondo de la imagen para
+      // compartir (1080 de ancho): no hace falta más resolución que esa.
+      const maxLado = pathPrefix === "noticias" ? 1080 : 1600;
+      const procesada = await redimensionar(file, maxLado);
       const formData = new FormData();
       formData.set("file", procesada);
       formData.set("pathPrefix", pathPrefix);
