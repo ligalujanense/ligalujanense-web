@@ -1,5 +1,5 @@
 import { ShareButtons } from "@/components/site/ShareButtons";
-import { CompartirFechaButton } from "@/components/site/CompartirFechaButton";
+import { CompartirImagenButton } from "@/components/site/CompartirImagenButton";
 
 export type PartidoFechaCard = {
   id: string;
@@ -97,9 +97,10 @@ export function FechaCard({
       </div>
 
       <div className="flex flex-col items-center gap-3">
-        <CompartirFechaButton
-          fechaId={fechaId}
+        <CompartirImagenButton
+          endpoint={`/api/fecha-imagen/${fechaId}`}
           titulo={`${zonaNombre} - Fecha ${numeroFecha}`}
+          nombreBase={`${zonaNombre} - Fecha ${numeroFecha}`}
         />
         <ShareButtons title={`${zonaNombre} — Fecha ${numeroFecha}`} path={path} />
       </div>

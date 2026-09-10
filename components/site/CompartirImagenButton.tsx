@@ -2,22 +2,30 @@
 
 import { useState } from "react";
 
-export function CompartirFechaButton({
-  fechaId,
+/**
+ * Genera una imagen (llamando a `endpoint`) y la comparte por el menú nativo del
+ * sistema — historia de Instagram, estado de WhatsApp, etc. En escritorio, donde
+ * no existe ese menú para archivos, la descarga.
+ */
+export function CompartirImagenButton({
+  endpoint,
   titulo,
+  nombreBase,
 }: {
-  fechaId: string;
+  endpoint: string;
   titulo: string;
+  nombreBase: string;
 }) {
   const [estado, setEstado] = useState<"idle" | "cargando" | "error">("idle");
 
   async function compartir() {
     setEstado("cargando");
     try {
-      const res = await fetch(`/api/fecha-imagen/${fechaId}?t=${Date.now()}`);
+      const sep = endpoint.includes("?") ? "&" : "?";
+      const res = await fetch(`${endpoint}${sep}t=${Date.now()}`);
       if (!res.ok) throw new Error("No se pudo generar la imagen");
       const blob = await res.blob();
-      const nombreArchivo = `${titulo.replace(/[^\w\s-]/g, "").trim() || "fecha"}.png`;
+      const nombreArchivo = `${nombreBase.replace(/[^\w\s-]/g, "").trim() || "imagen"}.png`;
       const file = new File([blob], nombreArchivo, { type: "image/png" });
 
       if (
@@ -26,7 +34,6 @@ export function CompartirFechaButton({
       ) {
         await navigator.share({ files: [file], title: titulo });
       } else {
-        // Escritorio: no hay menú de compartir con archivos → se descarga.
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -38,7 +45,6 @@ export function CompartirFechaButton({
       }
       setEstado("idle");
     } catch (e) {
-      // El usuario canceló el menú nativo — no es un error.
       if (e instanceof DOMException && e.name === "AbortError") {
         setEstado("idle");
         return;

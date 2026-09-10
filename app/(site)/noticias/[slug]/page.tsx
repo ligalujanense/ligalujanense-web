@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ShareButtons } from "@/components/site/ShareButtons";
+import { CompartirImagenButton } from "@/components/site/CompartirImagenButton";
 
 export default async function NoticiaDetallePage({
   params,
@@ -24,7 +25,14 @@ export default async function NoticiaDetallePage({
         Noticias
       </span>
       <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">{noticia.titulo}</h1>
-      <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
+      <div className="flex flex-wrap items-center gap-3">
+        <CompartirImagenButton
+          endpoint={`/api/noticia-imagen/${slug}`}
+          titulo={noticia.titulo}
+          nombreBase={noticia.titulo}
+        />
+        <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
+      </div>
       {noticia.imagen_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
