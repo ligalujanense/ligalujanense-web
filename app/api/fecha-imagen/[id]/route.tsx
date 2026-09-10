@@ -21,10 +21,10 @@ type P = {
 };
 
 function medidas(n: number) {
-  if (n <= 2) return { escudo: 150, nombre: 38, marcador: 60, col: 380, centro: 200 };
-  if (n === 3) return { escudo: 128, nombre: 33, marcador: 52, col: 380, centro: 190 };
-  if (n === 4) return { escudo: 104, nombre: 28, marcador: 44, col: 370, centro: 180 };
-  return { escudo: 84, nombre: 24, marcador: 38, col: 355, centro: 170 };
+  if (n <= 2) return { escudo: 190, nombre: 42, marcador: 66, col: 380, centro: 200 };
+  if (n === 3) return { escudo: 160, nombre: 37, marcador: 58, col: 380, centro: 190 };
+  if (n === 4) return { escudo: 128, nombre: 31, marcador: 48, col: 370, centro: 180 };
+  return { escudo: 100, nombre: 26, marcador: 40, col: 355, centro: 170 };
 }
 
 function Equipo({
@@ -175,24 +175,29 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
               style={{
-                fontSize: 28,
+                fontSize: 38,
                 fontWeight: 700,
-                letterSpacing: 3,
+                letterSpacing: 5,
                 color: DORADO,
                 textTransform: "uppercase",
               }}
             >
-              {zonaNombre} — Fecha {numeroFecha}
+              {zonaNombre}
+            </span>
+            <span
+              style={{ fontSize: 104, fontWeight: 800, color: CELESTE, lineHeight: 1.02 }}
+            >
+              Fecha {numeroFecha}
             </span>
             {fechaTexto && (
-              <span style={{ fontSize: 27, color: GRIS, marginTop: 4 }}>{fechaTexto}</span>
+              <span style={{ fontSize: 38, color: GRIS, marginTop: 8 }}>{fechaTexto}</span>
             )}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={LIGA_LOGO}
-            width={120}
-            height={132}
+            width={168}
+            height={185}
             style={{ objectFit: "contain" }}
             alt=""
           />
@@ -279,9 +284,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: 28,
+            marginTop: 24,
           }}
         >
+          <div style={{ width: 760, height: 2, background: "rgba(0,0,0,0.1)" }} />
           {filas.map((grupo, gi) =>
             grupo.length === 0 ? null : (
               <div
@@ -291,7 +297,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                   flexWrap: "wrap",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginTop: gi === 0 ? 0 : 16,
+                  marginTop: gi === 0 ? 30 : 24,
                 }}
               >
                 {grupo.map((sp, si) => (
@@ -299,8 +305,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                   <img
                     key={si}
                     src={sp.dataUri as string}
-                    height={gi === 0 ? 56 : 46}
-                    style={{ objectFit: "contain", margin: "0 22px" }}
+                    height={gi === 0 ? 82 : 64}
+                    style={{ objectFit: "contain", margin: "0 28px" }}
                     alt={sp.nombre}
                   />
                 ))}
@@ -310,6 +316,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
         </div>
       </div>
     ),
-    { width: 1080, height: 1920 }
+    {
+      width: 1080,
+      height: 1920,
+      headers: { "Cache-Control": "public, max-age=60, s-maxage=60" },
+    }
   );
 }

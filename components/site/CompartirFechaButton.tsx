@@ -14,7 +14,7 @@ export function CompartirFechaButton({
   async function compartir() {
     setEstado("cargando");
     try {
-      const res = await fetch(`/api/fecha-imagen/${fechaId}`);
+      const res = await fetch(`/api/fecha-imagen/${fechaId}?t=${Date.now()}`);
       if (!res.ok) throw new Error("No se pudo generar la imagen");
       const blob = await res.blob();
       const nombreArchivo = `${titulo.replace(/[^\w\s-]/g, "").trim() || "fecha"}.png`;
