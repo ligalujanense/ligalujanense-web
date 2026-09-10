@@ -274,11 +274,26 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                 </div>
               )}
               {!p.libre && p.estadio && (
-                <span
-                  style={{ fontSize: 20, color: GRIS, marginTop: 14, textAlign: "center" }}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "center",
+                    marginTop: 18,
+                  }}
                 >
-                  {p.estadio}
-                </span>
+                  <span
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 700,
+                      color: "#374151",
+                      marginRight: 8,
+                    }}
+                  >
+                    Estadio:
+                  </span>
+                  <span style={{ fontSize: 26, color: "#4b5563" }}>{p.estadio}</span>
+                </div>
               )}
             </div>
           ))}
@@ -305,12 +320,17 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                   marginTop: gi === 0 ? 30 : 26,
                 }}
               >
-                {grupo.map((sp, si) => (
+                {grupo.map((sp, si) => {
+                  // Los logos verticales (YAKY) quedan chicos con el mismo alto
+                  // que los apaisados; se les da más alto para emparejarlos.
+                  const vertical = /yaky/i.test(sp.nombre);
+                  const base = grupo.length <= 3 ? 78 : 62;
+                  return (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     key={si}
                     src={sp.dataUri as string}
-                    height={grupo.length <= 3 ? 78 : 62}
+                    height={vertical ? Math.round(base * 1.5) : base}
                     style={{
                       objectFit: "contain",
                       maxWidth: grupo.length <= 3 ? 320 : 240,
@@ -318,7 +338,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                     }}
                     alt={sp.nombre}
                   />
-                ))}
+                  );
+                })}
               </div>
             )
           )}
