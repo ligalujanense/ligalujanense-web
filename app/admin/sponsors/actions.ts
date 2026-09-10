@@ -10,6 +10,7 @@ export async function crearSponsor(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const url = String(formData.get("url") ?? "").trim();
   const logo_url = String(formData.get("logo_url") ?? "").trim();
+  const fila = Number(formData.get("fila")) === 2 ? 2 : 1;
   if (!nombre) return { error: "Falta el nombre" };
 
   const supabase = createAdminClient();
@@ -17,7 +18,22 @@ export async function crearSponsor(formData: FormData) {
     nombre,
     url: url || null,
     logo_url: logo_url || null,
+    fila,
   });
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/sponsors");
+  revalidatePath("/");
+}
+
+export async function cambiarFilaSponsor(id: string, fila: number) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("sponsors")
+    .update({ fila: fila === 2 ? 2 : 1 })
+    .eq("id", id);
   if (error) return { error: error.message };
 
   revalidatePath("/admin/sponsors");

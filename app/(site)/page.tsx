@@ -16,7 +16,7 @@ export default async function Home() {
         .eq("publicado", true)
         .order("created_at", { ascending: false })
         .limit(5),
-      supabase.from("sponsors").select("id, nombre, logo_url, url").order("orden"),
+      supabase.from("sponsors").select("id, nombre, logo_url, url, fila").order("orden"),
       supabase.from("zonas").select("id, nombre, temporada").order("nombre"),
     ]);
 
@@ -150,21 +150,51 @@ export default async function Home() {
         </section>
 
         {sponsors && sponsors.length > 0 && (
-          <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-celeste-oscuro">Sponsors</h2>
-            <div className="flex flex-wrap items-center gap-6 bg-white border border-neutral-200 rounded-xl px-6 py-5">
-              {sponsors.map((sponsor) => (
-                <a
-                  key={sponsor.id}
-                  href={sponsor.url ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-neutral-600 hover:text-dorado-oscuro"
+          <section className="flex flex-col items-center gap-10 py-6">
+            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">
+              Sponsors
+            </h2>
+            {[
+              { fila: 1, img: "max-h-20 max-w-[190px]" },
+              { fila: 2, img: "max-h-16 max-w-[160px]" },
+            ].map(({ fila, img }) => {
+              const deFila = sponsors.filter((s) => (s.fila ?? 1) === fila);
+              if (deFila.length === 0) return null;
+              return (
+                <div
+                  key={fila}
+                  className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8 max-w-4xl"
                 >
-                  {sponsor.nombre}
-                </a>
-              ))}
-            </div>
+                  {deFila.map((sponsor) => {
+                    const contenido = sponsor.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={sponsor.logo_url}
+                        alt={sponsor.nombre}
+                        className={`${img} w-auto object-contain grayscale opacity-60 transition-all hover:grayscale-0 hover:opacity-100`}
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-neutral-500">{sponsor.nombre}</span>
+                    );
+                    return sponsor.url ? (
+                      <a
+                        key={sponsor.id}
+                        href={sponsor.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center"
+                      >
+                        {contenido}
+                      </a>
+                    ) : (
+                      <div key={sponsor.id} className="flex items-center justify-center">
+                        {contenido}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </section>
         )}
       </div>

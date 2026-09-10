@@ -5,7 +5,8 @@ export default async function SponsorsAdminPage() {
   const supabase = createAdminClient();
   const { data: sponsors } = await supabase
     .from("sponsors")
-    .select("id, nombre, url")
+    .select("id, nombre, url, logo_url, fila")
+    .order("fila")
     .order("orden");
 
   return (
