@@ -2,13 +2,21 @@ import { ImageResponse } from "next/og";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO } from "@/lib/baked-assets.generated";
 
+const BUCKET = "imagenes";
 const OSCURO = "#0d1b24";
 const DORADO = "#D9A441";
 
-const ALTO_FOTO = 1040; // la foto ocupa solo la franja superior (rasterizar la
-// imagen completa a 1080x1920 supera el límite de CPU del Worker).
+const CACHE = "public, max-age=3600, s-maxage=31536000";
 
-async function imagenADataUri(url: string): Promise<string | null> {
+// Hash corto y estable del contenido: si cambia el título o la foto, cambia el
+// nombre del archivo guardado y se vuelve a generar en la próxima compartida.
+function hashCorto(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
+async function fotoDataUri(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
     if (!res.ok) return null;
@@ -21,108 +29,87 @@ async function imagenADataUri(url: string): Promise<string | null> {
   }
 }
 
-export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }> }) {
-  const { slug } = await ctx.params;
-  const supabase = createAdminClient();
+type Noticia = { titulo: string; imagen_url: string | null; created_at: string };
 
-  const { data: noticia } = await supabase
-    .from("noticias")
-    .select("titulo, imagen_url, created_at")
-    .eq("slug", slug)
-    .eq("publicado", true)
-    .single();
-
-  if (!noticia) return new Response("Noticia no encontrada", { status: 404 });
-
-  const fondo = noticia.imagen_url ? await imagenADataUri(noticia.imagen_url) : null;
-
-  const fecha = new Date(noticia.created_at).toLocaleDateString("es-AR", {
+async function generar(noticia: Noticia): Promise<ArrayBuffer> {
+  const fondo = noticia.imagen_url ? await fotoDataUri(noticia.imagen_url) : null;
+  let fecha = new Date(noticia.created_at).toLocaleDateString("es-AR", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+  fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
   const titulo = (noticia.titulo ?? "").slice(0, 170);
 
-  return new ImageResponse(
+  const img = new ImageResponse(
     (
       <div
         style={{
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          position: "relative",
           background: OSCURO,
         }}
       >
-        {/* Franja superior: foto (o color de marca si no hay) */}
+        {fondo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={fondo}
+            width={1080}
+            height={1920}
+            style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+            alt=""
+          />
+        )}
         <div
           style={{
-            width: 1080,
-            height: ALTO_FOTO,
+            position: "absolute",
+            inset: 0,
             display: "flex",
-            position: "relative",
-            background: "#123043",
+            background:
+              "linear-gradient(to top, rgba(13,27,36,0.97) 0%, rgba(13,27,36,0.15) 42%, rgba(13,27,36,0.72) 100%)",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            top: 64,
+            left: 60,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          {fondo && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={fondo}
-              width={1080}
-              height={ALTO_FOTO}
-              style={{ position: "absolute", inset: 0, objectFit: "cover" }}
-              alt=""
-            />
-          )}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              background:
-                "linear-gradient(to bottom, rgba(13,27,36,0.55) 0%, rgba(13,27,36,0) 30%, rgba(13,27,36,0) 70%, rgba(13,27,36,1) 100%)",
-            }}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={LIGA_LOGO}
+            width={78}
+            height={86}
+            style={{ objectFit: "contain", marginRight: 20 }}
+            alt=""
           />
-          {/* Encabezado */}
-          <div
+          <span
             style={{
-              position: "absolute",
-              top: 60,
-              left: 60,
-              display: "flex",
-              alignItems: "center",
+              color: "#ffffff",
+              fontSize: 30,
+              fontWeight: 700,
+              letterSpacing: 3,
+              textTransform: "uppercase",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={LIGA_LOGO}
-              width={78}
-              height={86}
-              style={{ objectFit: "contain", marginRight: 20 }}
-              alt=""
-            />
-            <span
-              style={{
-                color: "#ffffff",
-                fontSize: 30,
-                fontWeight: 700,
-                letterSpacing: 3,
-                textTransform: "uppercase",
-              }}
-            >
-              Liga Lujanense
-            </span>
-          </div>
+            Liga Lujanense
+          </span>
         </div>
 
-        {/* Panel inferior con el texto */}
         <div
           style={{
-            flex: 1,
+            position: "absolute",
+            bottom: 108,
+            left: 60,
+            right: 60,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
-            padding: "0 64px",
           }}
         >
           <div style={{ display: "flex" }}>
@@ -144,19 +131,19 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
           <span
             style={{
               color: "#ffffff",
-              fontSize: 74,
+              fontSize: 76,
               fontWeight: 800,
               lineHeight: 1.1,
-              marginTop: 30,
+              marginTop: 28,
             }}
           >
             {titulo}
           </span>
           <span
             style={{
-              color: "rgba(255,255,255,0.6)",
+              color: "rgba(255,255,255,0.62)",
               fontSize: 31,
-              marginTop: 24,
+              marginTop: 22,
               textTransform: "capitalize",
             }}
           >
@@ -165,14 +152,43 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
         </div>
       </div>
     ),
-    {
-      width: 1080,
-      height: 1920,
-      headers: {
-        // Contenido estable por noticia → se cachea fuerte en el borde: la
-        // primera generación exitosa queda servida al instante para todos.
-        "Cache-Control": "public, max-age=300, s-maxage=604800",
-      },
-    }
+    { width: 1080, height: 1920 }
   );
+
+  return img.arrayBuffer();
+}
+
+export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }> }) {
+  const { slug } = await ctx.params;
+  const supabase = createAdminClient();
+
+  const { data: noticia } = await supabase
+    .from("noticias")
+    .select("titulo, imagen_url, created_at")
+    .eq("slug", slug)
+    .eq("publicado", true)
+    .single();
+
+  if (!noticia) return new Response("Noticia no encontrada", { status: 404 });
+
+  const version = hashCorto(`${noticia.titulo}|${noticia.imagen_url ?? ""}`);
+  const path = `og/noticias/${slug}-${version}.png`;
+
+  // 1) ¿ya está generada y guardada? -> se sirve sin dibujar nada.
+  const { data: guardada } = await supabase.storage.from(BUCKET).download(path);
+  if (guardada) {
+    return new Response(guardada, {
+      headers: { "Content-Type": "image/png", "Cache-Control": CACHE },
+    });
+  }
+
+  // 2) primera vez -> se genera, se guarda en Supabase y se devuelve.
+  const buf = await generar(noticia as Noticia);
+  await supabase.storage
+    .from(BUCKET)
+    .upload(path, buf, { contentType: "image/png", upsert: true });
+
+  return new Response(buf, {
+    headers: { "Content-Type": "image/png", "Cache-Control": CACHE },
+  });
 }
