@@ -155,9 +155,9 @@ export default async function Home() {
               Sponsors
             </h2>
             {[
-              { fila: 1, img: "max-h-20 max-w-[190px]" },
-              { fila: 2, img: "max-h-16 max-w-[160px]" },
-            ].map(({ fila, img }) => {
+              { fila: 1, img: "max-h-20 max-w-[190px]", imgVertical: "max-h-28 max-w-[190px]" },
+              { fila: 2, img: "max-h-16 max-w-[160px]", imgVertical: "max-h-24 max-w-[160px]" },
+            ].map(({ fila, img, imgVertical }) => {
               const deFila = sponsors.filter((s) => (s.fila ?? 1) === fila);
               if (deFila.length === 0) return null;
               return (
@@ -166,12 +166,17 @@ export default async function Home() {
                   className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8 max-w-4xl"
                 >
                   {deFila.map((sponsor) => {
+                    // Los logos verticales quedan chicos con el mismo max-h que los
+                    // apaisados; se les da más alto para igualar el tamaño visual.
+                    const esVertical = ["yaky"].some((n) =>
+                      sponsor.nombre.toLowerCase().includes(n)
+                    );
                     const contenido = sponsor.logo_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={sponsor.logo_url}
                         alt={sponsor.nombre}
-                        className={`${img} w-auto object-contain grayscale opacity-60 transition-all hover:grayscale-0 hover:opacity-100`}
+                        className={`${esVertical ? imgVertical : img} w-auto object-contain grayscale opacity-60 transition-all hover:grayscale-0 hover:opacity-100`}
                       />
                     ) : (
                       <span className="text-sm font-medium text-neutral-500">{sponsor.nombre}</span>
