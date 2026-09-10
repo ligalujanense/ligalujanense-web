@@ -55,6 +55,7 @@ export default async function FechaPage({
   return (
     <main className="max-w-3xl mx-auto px-4 py-10">
       <FechaCard
+        fechaId={id}
         zonaNombre={zonaNombre}
         numeroFecha={fecha.numero_fecha}
         fechaTexto={fechaTexto}

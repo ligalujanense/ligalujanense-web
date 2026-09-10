@@ -1,4 +1,5 @@
 import { ShareButtons } from "@/components/site/ShareButtons";
+import { CompartirFechaButton } from "@/components/site/CompartirFechaButton";
 
 export type PartidoFechaCard = {
   id: string;
@@ -31,12 +32,14 @@ function EquipoBloque({ nombre, logoUrl }: { nombre: string; logoUrl: string | n
 }
 
 export function FechaCard({
+  fechaId,
   zonaNombre,
   numeroFecha,
   fechaTexto,
   partidos,
   path,
 }: {
+  fechaId: string;
   zonaNombre: string;
   numeroFecha: number;
   fechaTexto: string | null;
@@ -93,7 +96,11 @@ export function FechaCard({
         )}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <CompartirFechaButton
+          fechaId={fechaId}
+          titulo={`${zonaNombre} - Fecha ${numeroFecha}`}
+        />
         <ShareButtons title={`${zonaNombre} — Fecha ${numeroFecha}`} path={path} />
       </div>
     </div>

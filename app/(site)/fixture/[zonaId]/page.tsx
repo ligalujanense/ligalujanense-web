@@ -74,6 +74,7 @@ export default async function FixtureZonaPage({
             return (
               <FechaCard
                 key={fecha.id}
+                fechaId={fecha.id}
                 zonaNombre={zona.nombre}
                 numeroFecha={fecha.numero_fecha}
                 fechaTexto={fechaTexto}
