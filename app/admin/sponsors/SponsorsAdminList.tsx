@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { crearSponsor, eliminarSponsor, cambiarFilaSponsor, editarSponsor } from "./actions";
+import {
+  crearSponsor,
+  eliminarSponsor,
+  cambiarFilaSponsor,
+  editarSponsor,
+  moverSponsor,
+} from "./actions";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 
 type Sponsor = {
@@ -128,13 +134,38 @@ export function SponsorsAdminList({ sponsors }: { sponsors: Sponsor[] }) {
       </form>
 
       <ul className="flex flex-col gap-2">
-        {sponsors.map((sponsor) => (
+        {sponsors.map((sponsor, i) => {
+          const mismoFilaArriba = sponsors.slice(0, i).some(
+            (s) => (s.fila ?? 1) === (sponsor.fila ?? 1)
+          );
+          const mismoFilaAbajo = sponsors.slice(i + 1).some(
+            (s) => (s.fila ?? 1) === (sponsor.fila ?? 1)
+          );
+          return (
           <li
             key={sponsor.id}
             className="flex flex-col gap-3 bg-white border border-neutral-200 rounded-lg px-4 py-2"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
+                <div className="flex flex-col shrink-0">
+                  <button
+                    onClick={() => startTransition(() => { moverSponsor(sponsor.id, "arriba"); })}
+                    disabled={!mismoFilaArriba}
+                    className="text-neutral-500 hover:text-celeste-oscuro disabled:opacity-20 text-xs leading-none"
+                    aria-label="Subir"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => startTransition(() => { moverSponsor(sponsor.id, "abajo"); })}
+                    disabled={!mismoFilaAbajo}
+                    className="text-neutral-500 hover:text-celeste-oscuro disabled:opacity-20 text-xs leading-none"
+                    aria-label="Bajar"
+                  >
+                    ▼
+                  </button>
+                </div>
                 {sponsor.logo_url && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={sponsor.logo_url} alt="" className="h-8 w-16 object-contain shrink-0" />
@@ -172,7 +203,8 @@ export function SponsorsAdminList({ sponsors }: { sponsors: Sponsor[] }) {
               <SponsorEditForm sponsor={sponsor} onGuardado={() => setEditando(null)} />
             )}
           </li>
-        ))}
+          );
+        })}
         {sponsors.length === 0 && (
           <p className="text-neutral-500 text-sm">No hay sponsors cargados todavía.</p>
         )}

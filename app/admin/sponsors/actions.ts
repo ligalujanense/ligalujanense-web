@@ -14,11 +14,19 @@ export async function crearSponsor(formData: FormData) {
   if (!nombre) return { error: "Falta el nombre" };
 
   const supabase = createAdminClient();
+  const { data: ultimos } = await supabase
+    .from("sponsors")
+    .select("orden")
+    .order("orden", { ascending: false })
+    .limit(1);
+  const orden = ((ultimos?.[0]?.orden as number | null) ?? -1) + 1;
+
   const { error } = await supabase.from("sponsors").insert({
     nombre,
     url: url || null,
     logo_url: logo_url || null,
     fila,
+    orden,
   });
   if (error) return { error: error.message };
 
@@ -56,6 +64,42 @@ export async function cambiarFilaSponsor(id: string, fila: number) {
     .update({ fila: fila === 2 ? 2 : 1 })
     .eq("id", id);
   if (error) return { error: error.message };
+
+  revalidatePath("/admin/sponsors");
+  revalidatePath("/");
+}
+
+export async function moverSponsor(id: string, direccion: "arriba" | "abajo") {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+
+  const supabase = createAdminClient();
+  const { data: todos, error: errLeer } = await supabase
+    .from("sponsors")
+    .select("id, nombre, fila, orden");
+  if (errLeer || !todos) return { error: errLeer?.message ?? "No se pudo leer" };
+
+  const actual = todos.find((s) => s.id === id);
+  if (!actual) return { error: "Sponsor no encontrado" };
+
+  const fila = (actual.fila as number | null) ?? 1;
+  const grupo = todos
+    .filter((s) => ((s.fila as number | null) ?? 1) === fila)
+    .sort(
+      (a, b) =>
+        ((a.orden as number | null) ?? 0) - ((b.orden as number | null) ?? 0) ||
+        String(a.nombre).localeCompare(String(b.nombre))
+    );
+
+  const i = grupo.findIndex((s) => s.id === id);
+  const j = direccion === "arriba" ? i - 1 : i + 1;
+  if (i < 0 || j < 0 || j >= grupo.length) return; // ya está en el borde
+
+  [grupo[i], grupo[j]] = [grupo[j], grupo[i]];
+
+  for (let k = 0; k < grupo.length; k++) {
+    const { error } = await supabase.from("sponsors").update({ orden: k }).eq("id", grupo[k].id);
+    if (error) return { error: error.message };
+  }
 
   revalidatePath("/admin/sponsors");
   revalidatePath("/");
