@@ -77,6 +77,32 @@ export async function alternarPublicado(id: string, publicado: boolean) {
   revalidatePath("/");
 }
 
+// Borra el collage guardado de una noticia (og/noticias/<slug>-<hash>.png) para
+// que la próxima vez que se pida /api/noticia-imagen/<slug> se genere de nuevo.
+// La regeneración la dispara el navegador (no se puede desde acá: el Worker no
+// puede hacerse fetch a sí mismo).
+export async function borrarImagenRedes(slug: string) {
+  if (!(await isAdmin())) return { error: "No autorizado" };
+  if (!slug) return { error: "Falta el slug" };
+
+  const supabase = createAdminClient();
+  const { data: archivos, error: errLista } = await supabase.storage
+    .from("imagenes")
+    .list("og/noticias", { search: slug, limit: 100 });
+  if (errLista) return { error: errLista.message };
+
+  const rutas = (archivos ?? [])
+    .filter((a) => a.name.startsWith(`${slug}-`))
+    .map((a) => `og/noticias/${a.name}`);
+
+  if (rutas.length > 0) {
+    const { error } = await supabase.storage.from("imagenes").remove(rutas);
+    if (error) return { error: error.message };
+  }
+
+  return { ok: true as const, borrados: rutas.length };
+}
+
 export async function eliminarNoticia(id: string) {
   if (!(await isAdmin())) return { error: "No autorizado" };
 
