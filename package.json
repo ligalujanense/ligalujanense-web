@@ -7,10 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "bake": "node scripts/bake-assets.mjs",
-    "cf:build": "opennextjs-cloudflare build",
-    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "bake": "node scripts/bake-assets.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
@@ -20,7 +17,6 @@
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.20.2",
     "@types/node": "^20",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
@@ -30,7 +26,6 @@
     "postcss": "^8",
     "sharp": "^0.35.3",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "wrangler": "^4.125.0"
+    "typescript": "^5"
   }
 }

@@ -2,6 +2,9 @@ import { ImageResponse } from "next/og";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO, SPONSORS_BAKED, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 
+// Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
+export const maxDuration = 30;
+
 const CREMA = "#F7F5F0";
 const CELESTE = "#0E7FAE";
 const DORADO = "#B5842E";
