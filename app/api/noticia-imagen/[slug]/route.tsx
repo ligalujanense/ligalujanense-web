@@ -11,8 +11,12 @@ const DORADO = "#D9A441";
 
 const CACHE = "public, max-age=3600, s-maxage=31536000";
 
-// Hash corto y estable del contenido: si cambia el título o la foto, cambia el
-// nombre del archivo guardado y se vuelve a generar en la próxima compartida.
+// Subir este número cada vez que cambie el diseño del collage: cambia el nombre
+// de los archivos guardados y todas las noticias se regeneran solas.
+const VERSION_DISENO = "v1";
+
+// Hash corto y estable del contenido: si cambia el título, la foto o el diseño,
+// cambia el nombre del archivo guardado y se vuelve a generar en la próxima compartida.
 function hashCorto(s: string): string {
   let h = 5381;
   for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
@@ -24,7 +28,7 @@ async function fotoDataUri(url: string): Promise<string | null> {
     const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.byteLength > 1_600_000) return null;
+    if (buf.byteLength > 6_000_000) return null;
     const ct = res.headers.get("content-type") ?? "image/jpeg";
     return `data:${ct};base64,${buf.toString("base64")}`;
   } catch {
@@ -34,8 +38,13 @@ async function fotoDataUri(url: string): Promise<string | null> {
 
 type Noticia = { titulo: string; imagen_url: string | null; created_at: string };
 
-async function generar(noticia: Noticia): Promise<ArrayBuffer> {
+// `completo` es false cuando la noticia tiene foto pero no se pudo traer: en ese
+// caso el collage sale sin foto y NO se guarda, para que se reintente la próxima vez.
+async function generar(
+  noticia: Noticia
+): Promise<{ buf: ArrayBuffer; completo: boolean }> {
   const fondo = noticia.imagen_url ? await fotoDataUri(noticia.imagen_url) : null;
+  const completo = !noticia.imagen_url || fondo !== null;
   let fecha = new Date(noticia.created_at).toLocaleDateString("es-AR", {
     day: "numeric",
     month: "long",
@@ -158,7 +167,7 @@ async function generar(noticia: Noticia): Promise<ArrayBuffer> {
     { width: 1080, height: 1920 }
   );
 
-  return img.arrayBuffer();
+  return { buf: await img.arrayBuffer(), completo };
 }
 
 export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }> }) {
@@ -174,7 +183,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
 
   if (!noticia) return new Response("Noticia no encontrada", { status: 404 });
 
-  const version = hashCorto(`${noticia.titulo}|${noticia.imagen_url ?? ""}`);
+  const version = hashCorto(
+    `${VERSION_DISENO}|${noticia.titulo}|${noticia.imagen_url ?? ""}`
+  );
   const path = `og/noticias/${slug}-${version}.png`;
 
   // 1) ¿ya está generada y guardada? -> se sirve sin dibujar nada.
@@ -186,12 +197,18 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
   }
 
   // 2) primera vez -> se genera, se guarda en Supabase y se devuelve.
-  const buf = await generar(noticia as Noticia);
-  await supabase.storage
-    .from(BUCKET)
-    .upload(path, buf, { contentType: "image/png", upsert: true });
+  const { buf, completo } = await generar(noticia as Noticia);
+  if (completo) {
+    await supabase.storage
+      .from(BUCKET)
+      .upload(path, buf, { contentType: "image/png", upsert: true });
+  }
 
   return new Response(buf, {
-    headers: { "Content-Type": "image/png", "Cache-Control": CACHE },
+    headers: {
+      "Content-Type": "image/png",
+      // Si salió incompleta no se cachea en ningún lado.
+      "Cache-Control": completo ? CACHE : "no-store",
+    },
   });
 }

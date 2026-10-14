@@ -2,12 +2,11 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { actualizarNoticia, alternarPublicado, eliminarNoticia, borrarImagenRedes } from "./actions";
+import { actualizarNoticia, alternarPublicado, eliminarNoticia } from "./actions";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 
 type Noticia = {
   id: string;
-  slug: string;
   titulo: string;
   resumen: string | null;
   contenido: string | null;
@@ -76,7 +75,6 @@ export function NoticiasTable({ noticias }: { noticias: Noticia[] }) {
                       <button onClick={() => setEditingId(noticia.id)} className="text-celeste-oscuro hover:underline">
                         Editar
                       </button>
-                      {noticia.publicado && <RegenerarImagenRedes slug={noticia.slug} />}
                       <button
                         disabled={isPending}
                         onClick={() =>
@@ -111,56 +109,6 @@ export function NoticiasTable({ noticias }: { noticias: Noticia[] }) {
         </table>
       </div>
     </div>
-  );
-}
-
-// Borra el collage guardado y lo vuelve a generar desde el navegador (la ruta
-// /api/noticia-imagen lo crea y lo guarda de nuevo). Reintenta si el Worker
-// devuelve 503 por límite de CPU.
-function RegenerarImagenRedes({ slug }: { slug: string }) {
-  const [estado, setEstado] = useState<"idle" | "trabajando" | "ok" | "error">("idle");
-
-  async function regenerar() {
-    setEstado("trabajando");
-    try {
-      const borrado = await borrarImagenRedes(slug);
-      if (borrado?.error) throw new Error(borrado.error);
-
-      for (let intento = 0; intento < 3; intento++) {
-        const res = await fetch(`/api/noticia-imagen/${slug}?t=${Date.now()}`, {
-          cache: "no-store",
-        });
-        if (res.ok) {
-          await res.blob();
-          setEstado("ok");
-          setTimeout(() => setEstado("idle"), 4000);
-          return;
-        }
-        if (intento < 2) await new Promise((r) => setTimeout(r, 1600));
-      }
-      throw new Error("No se pudo generar");
-    } catch {
-      setEstado("error");
-      setTimeout(() => setEstado("idle"), 4000);
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={regenerar}
-      disabled={estado === "trabajando"}
-      title="Vuelve a generar la imagen que se comparte en historias/estados"
-      className="text-celeste-oscuro hover:underline disabled:opacity-50"
-    >
-      {estado === "trabajando"
-        ? "Generando…"
-        : estado === "ok"
-          ? "✓ Imagen lista"
-          : estado === "error"
-            ? "Error, reintentá"
-            : "Regenerar imagen"}
-    </button>
   );
 }
 
