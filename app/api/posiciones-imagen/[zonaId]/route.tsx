@@ -13,10 +13,10 @@ const DORADO = "#B5842E";
 const GRIS = "#737373";
 
 // Anchos de columna (el ancho útil dentro de la tarjeta es ~900 px).
-const W_POS = 56;
-const W_NOMBRE = 300; // escudo + nombre
-const W_STAT = 58;
-const W_PTS = 84;
+const W_POS = 50;
+const W_NOMBRE = 350; // escudo + nombre
+const W_STAT = 54;
+const W_PTS = 80;
 
 function Celda({
   ancho,
@@ -91,7 +91,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ zonaId: string
   const rowH = Math.max(64, Math.min(150, Math.floor(1060 / n)));
   const escudo = Math.min(76, rowH - 22);
   const tNombre = rowH >= 100 ? 30 : rowH >= 80 ? 26 : 22;
-  const tStat = rowH >= 100 ? 32 : rowH >= 80 ? 28 : 24;
+  const tStat = rowH >= 100 ? 30 : rowH >= 80 ? 27 : 23;
 
   return new ImageResponse(
     (
@@ -224,7 +224,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ zonaId: string
                   <div style={{ display: "flex", width: W_NOMBRE - escudo - 14 }}>
                     <span
                       style={{
-                        fontSize: tNombre,
+                        // nombres largos: letra más chica para que entren en la fila
+                        fontSize: fila.nombre.length > 26 ? tNombre - 6 : tNombre,
                         fontWeight: 700,
                         color: CELESTE,
                         lineHeight: 1.1,
