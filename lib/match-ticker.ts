@@ -18,6 +18,35 @@ type FechaConPartidos = {
   partidos: unknown[];
 };
 
+type PartidoVisible = { estado: string };
+type FechaConFecha = {
+  fecha: string | null;
+  partidos: PartidoVisible[];
+};
+
+/** Fecha de hoy (YYYY-MM-DD) en horario de Argentina, que es el de la liga. */
+export function hoyArgentina(): string {
+  return new Date().toLocaleDateString("en-CA", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+}
+
+/**
+ * La cinta del inicio solo "anuncia": próximos partidos o últimos resultados.
+ * Un partido que NO se jugó (sin resultado cargado) y cuya fecha ya pasó deja de
+ * mostrarse. Se mantiene si ya tiene resultado, si todavía no llegó su día
+ * (el día del partido se sigue viendo hasta que termina) o si la fecha no tiene
+ * día definido.
+ */
+export function soloVigentes<T extends FechaConFecha>(fechas: T[], hoy = hoyArgentina()): T[] {
+  return fechas.map((f) => ({
+    ...f,
+    partidos: f.partidos.filter(
+      (p) => p.estado === "jugado" || !f.fecha || f.fecha >= hoy
+    ),
+  }));
+}
+
 /**
  * Elige, dentro de las fechas de una zona, la fecha "activa": la más
  * reciente que ya tenga partidos cargados (sin importar si están
