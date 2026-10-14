@@ -33,15 +33,19 @@ export type EstadoCompartir = "idle" | "cargando" | "error" | "copiado";
  *      o compartir el link con el menú nativo.
  *   3. Si tampoco hay menú nativo: copiar el link al portapapeles.
  */
-export function useCompartirImagen({
-  endpoint,
-  titulo,
-  nombreBase,
-  url,
-  cacheBust = true,
-  precargar = false,
-  descargarEnEscritorio = true,
-}: OpcionesImagen) {
+export function useCompartirImagen(
+  {
+    endpoint,
+    titulo,
+    nombreBase,
+    url,
+    cacheBust = true,
+    precargar = false,
+    descargarEnEscritorio = true,
+  }: OpcionesImagen,
+  /** false: el hook no hace nada (para páginas sin imagen). */
+  habilitado = true
+) {
   const [estado, setEstado] = useState<EstadoCompartir>("idle");
   const precargada = useRef<Promise<Blob> | null>(null);
 
@@ -61,16 +65,17 @@ export function useCompartirImagen({
   }
 
   useEffect(() => {
-    if (!precargar) return;
+    if (!habilitado || !precargar) return;
     const p = pedirImagen();
     p.catch(() => {
       precargada.current = null;
     });
     precargada.current = p;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endpoint, precargar]);
+  }, [endpoint, precargar, habilitado]);
 
   async function compartir() {
+    if (!habilitado) return;
     setEstado("cargando");
     try {
       const blob = await (precargada.current ?? pedirImagen());
