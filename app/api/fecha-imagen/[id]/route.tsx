@@ -24,6 +24,7 @@ type P = {
 };
 
 function medidas(n: number) {
+  if (n <= 1) return { escudo: 250, nombre: 50, marcador: 84, col: 380, centro: 200 };
   if (n <= 2) return { escudo: 190, nombre: 42, marcador: 66, col: 380, centro: 200 };
   if (n === 3) return { escudo: 160, nombre: 37, marcador: 58, col: 380, centro: 190 };
   if (n === 4) return { escudo: 128, nombre: 31, marcador: 48, col: 370, centro: 180 };
@@ -94,8 +95,10 @@ function Equipo({
   );
 }
 
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
+  // ?partido=<id> -> imagen de UN solo partido de la fecha (mismo diseño y sponsors).
+  const soloPartido = new URL(req.url).searchParams.get("partido");
   const supabase = createAdminClient();
 
   const { data: fecha } = await supabase
@@ -133,7 +136,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
   }
 
-  const partidos: P[] = (f.partidos ?? []).map((p: any) => ({
+  const partidos: P[] = (f.partidos ?? [])
+    .filter((p: any) => !soloPartido || p.id === soloPartido)
+    .map((p: any) => ({
     libre: p.libre_equipo?.clubes?.nombre ?? null,
     localNombre: p.equipo_local?.clubes?.nombre ?? "?",
     localLogo: CLUB_LOGOS[p.equipo_local?.club_id ?? ""] ?? null,

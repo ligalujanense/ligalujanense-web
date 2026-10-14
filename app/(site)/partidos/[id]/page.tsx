@@ -13,7 +13,7 @@ export default async function PartidoPage({
   const { data: partido } = await supabase
     .from("partidos")
     .select(
-      `id, hora, estadio, estado, resultado_local, resultado_visitante,
+      `id, fixture_fecha_id, hora, estadio, estado, resultado_local, resultado_visitante,
        fixture_fechas ( numero_fecha, fecha, zonas ( nombre ) ),
        equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
        equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) )`
@@ -81,6 +81,10 @@ export default async function PartidoPage({
         <ShareButtons
           title={`${local?.nombre ?? "?"} vs ${visitante?.nombre ?? "?"}`}
           path={`/partidos/${id}`}
+          imagen={{
+            endpoint: `/api/fecha-imagen/${partido.fixture_fecha_id}?partido=${id}`,
+            nombreBase: `${local?.nombre ?? "Partido"} vs ${visitante?.nombre ?? ""}`,
+          }}
         />
       </div>
     </main>
