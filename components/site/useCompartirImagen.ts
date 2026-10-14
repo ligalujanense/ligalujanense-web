@@ -2,9 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
+export type OpcionesImagen = {
+  /** Ruta que genera la imagen (PNG). */
+  endpoint: string;
+  /** Texto que acompaña al compartir. */
+  titulo: string;
+  /** Nombre base del archivo descargado/compartido. */
+  nombreBase: string;
+  /** Link a compartir si no se puede compartir el archivo (ruta o URL). */
+  url?: string;
+  /** true: pide siempre la imagen fresca (datos que cambian, ej. fixture).
+   *  false: deja que se cachee (contenido estable, ej. noticias). */
+  cacheBust?: boolean;
+  /** Baja la imagen apenas se muestra el botón, así el toque comparte al
+   *  instante (los celulares exigen que compartir ocurra dentro del toque). */
+  precargar?: boolean;
+  /** Si no se puede compartir el archivo: true = se descarga la imagen. */
+  descargarEnEscritorio?: boolean;
+};
+
+export type EstadoCompartir = "idle" | "cargando" | "error" | "copiado";
+
 /**
- * Genera una imagen (llamando a `endpoint`) y la comparte por el menú nativo del
- * sistema — historia de Instagram, estado de WhatsApp, etc.
+ * Genera una imagen y la comparte por el menú nativo del sistema (historia de
+ * Instagram, estado de WhatsApp, etc.).
  *
  * Orden de intentos (igual que en deporve-web):
  *   1. Compartir el archivo con el menú nativo (celulares y navegadores que lo permiten).
@@ -12,37 +33,23 @@ import { useEffect, useRef, useState } from "react";
  *      o compartir el link con el menú nativo.
  *   3. Si tampoco hay menú nativo: copiar el link al portapapeles.
  */
-export function CompartirImagenButton({
+export function useCompartirImagen({
   endpoint,
   titulo,
   nombreBase,
-  cacheBust = true,
   url,
+  cacheBust = true,
   precargar = false,
   descargarEnEscritorio = true,
-}: {
-  endpoint: string;
-  titulo: string;
-  nombreBase: string;
-  /** true: pide siempre la imagen fresca (datos que cambian, ej. fixture).
-   *  false: deja que se cachee (contenido estable, ej. noticias). */
-  cacheBust?: boolean;
-  /** Link a compartir cuando no se puede compartir el archivo (ruta o URL). */
-  url?: string;
-  /** Baja la imagen apenas se muestra el botón, así el toque comparte al
-   *  instante (los celulares exigen que compartir ocurra dentro del toque). */
-  precargar?: boolean;
-  /** Si no se puede compartir el archivo: true = se descarga la imagen. */
-  descargarEnEscritorio?: boolean;
-}) {
-  const [estado, setEstado] = useState<"idle" | "cargando" | "error" | "copiado">("idle");
+}: OpcionesImagen) {
+  const [estado, setEstado] = useState<EstadoCompartir>("idle");
   const precargada = useRef<Promise<Blob> | null>(null);
 
   function pedirImagen(): Promise<Blob> {
     const dir = cacheBust
       ? `${endpoint}${endpoint.includes("?") ? "&" : "?"}t=${Date.now()}`
       : endpoint;
-    // El generador puede devolver 503 puntualmente: se reintenta un par de veces.
+    // El generador puede devolver un error puntual: se reintenta un par de veces.
     return (async () => {
       for (let intento = 0; intento < 3; intento++) {
         const res = await fetch(dir);
@@ -117,20 +124,5 @@ export function CompartirImagenButton({
     }
   }
 
-  return (
-    <button
-      type="button"
-      onClick={compartir}
-      disabled={estado === "cargando"}
-      className="inline-flex items-center gap-2 rounded-full bg-celeste-oscuro px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-celeste disabled:opacity-60"
-    >
-      {estado === "cargando"
-        ? "Generando imagen…"
-        : estado === "error"
-          ? "Error, reintentá"
-          : estado === "copiado"
-            ? "Link copiado"
-            : "Compartir imagen"}
-    </button>
-  );
+  return { estado, compartir };
 }

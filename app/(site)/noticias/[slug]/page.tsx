@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ShareButtons } from "@/components/site/ShareButtons";
-import { CompartirImagenButton } from "@/components/site/CompartirImagenButton";
 import type { Metadata } from "next";
 
 // Vista previa del link (WhatsApp, Facebook, X): título, resumen y la foto de la
@@ -63,18 +62,16 @@ export default async function NoticiaDetallePage({
         Noticias
       </span>
       <h1 className="text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">{noticia.titulo}</h1>
-      <div className="flex flex-wrap items-center gap-3">
-        <CompartirImagenButton
-          endpoint={`/api/noticia-imagen/${slug}`}
-          titulo={noticia.titulo}
-          nombreBase={noticia.titulo}
-          cacheBust={false}
-          precargar
-          descargarEnEscritorio={false}
-          url={`/noticias/${slug}`}
-        />
-        <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
-      </div>
+      <ShareButtons
+        title={noticia.titulo}
+        path={`/noticias/${slug}`}
+        imagen={{
+          endpoint: `/api/noticia-imagen/${slug}`,
+          nombreBase: noticia.titulo,
+          cacheBust: false,
+          precargar: true,
+        }}
+      />
       {noticia.imagen_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img

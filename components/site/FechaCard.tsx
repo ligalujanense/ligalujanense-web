@@ -1,5 +1,4 @@
 import { ShareButtons } from "@/components/site/ShareButtons";
-import { CompartirImagenButton } from "@/components/site/CompartirImagenButton";
 
 export type PartidoFechaCard = {
   id: string;
@@ -96,13 +95,15 @@ export function FechaCard({
         )}
       </div>
 
-      <div className="flex flex-col items-center gap-3">
-        <CompartirImagenButton
-          endpoint={`/api/fecha-imagen/${fechaId}`}
-          titulo={`${zonaNombre} - Fecha ${numeroFecha}`}
-          nombreBase={`${zonaNombre} - Fecha ${numeroFecha}`}
+      <div className="flex justify-center">
+        <ShareButtons
+          title={`${zonaNombre} — Fecha ${numeroFecha}`}
+          path={path}
+          imagen={{
+            endpoint: `/api/fecha-imagen/${fechaId}`,
+            nombreBase: `${zonaNombre} - Fecha ${numeroFecha}`,
+          }}
         />
-        <ShareButtons title={`${zonaNombre} — Fecha ${numeroFecha}`} path={path} />
       </div>
     </div>
   );
