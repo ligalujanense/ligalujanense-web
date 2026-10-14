@@ -8,9 +8,22 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ligalujanense.com";
+
 export const metadata: Metadata = {
+  // Necesario para que las URLs de imagen de las vistas previas (WhatsApp,
+  // Facebook, X) se resuelvan como absolutas.
+  metadataBase: new URL(BASE),
   title: "Liga Lujanense de Fútbol",
   description: "Sitio oficial de la Liga Lujanense de Fútbol",
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: "Liga Lujanense de Fútbol",
+    title: "Liga Lujanense de Fútbol",
+    description: "Sitio oficial de la Liga Lujanense de Fútbol",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({

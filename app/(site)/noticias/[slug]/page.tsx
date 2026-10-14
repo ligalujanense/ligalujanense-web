@@ -2,6 +2,44 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ShareButtons } from "@/components/site/ShareButtons";
 import { CompartirImagenButton } from "@/components/site/CompartirImagenButton";
+import type { Metadata } from "next";
+
+// Vista previa del link (WhatsApp, Facebook, X): título, resumen y la foto de la
+// noticia. Sin esto, al compartir el link no aparece ninguna imagen.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("noticias")
+    .select("titulo, resumen, imagen_url")
+    .eq("slug", slug)
+    .eq("publicado", true)
+    .single();
+  if (!data) return { title: "Noticia" };
+
+  const descripcion = data.resumen ?? "Liga Lujanense de Fútbol";
+  return {
+    title: data.titulo,
+    description: descripcion,
+    openGraph: {
+      type: "article",
+      title: data.titulo,
+      description: descripcion,
+      url: `/noticias/${slug}`,
+      images: data.imagen_url ? [{ url: data.imagen_url, alt: data.titulo }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: data.titulo,
+      description: descripcion,
+      images: data.imagen_url ? [data.imagen_url] : undefined,
+    },
+  };
+}
 
 export default async function NoticiaDetallePage({
   params,
@@ -31,6 +69,9 @@ export default async function NoticiaDetallePage({
           titulo={noticia.titulo}
           nombreBase={noticia.titulo}
           cacheBust={false}
+          precargar
+          descargarEnEscritorio={false}
+          url={`/noticias/${slug}`}
         />
         <ShareButtons title={noticia.titulo} path={`/noticias/${slug}`} />
       </div>

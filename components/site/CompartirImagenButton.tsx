@@ -1,65 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Genera una imagen (llamando a `endpoint`) y la comparte por el menú nativo del
- * sistema — historia de Instagram, estado de WhatsApp, etc. En escritorio, donde
- * no existe ese menú para archivos, la descarga.
+ * sistema — historia de Instagram, estado de WhatsApp, etc.
+ *
+ * Orden de intentos (igual que en deporve-web):
+ *   1. Compartir el archivo con el menú nativo (celulares y navegadores que lo permiten).
+ *   2. Si no se puede compartir archivos: descargar la imagen (si `descargarEnEscritorio`)
+ *      o compartir el link con el menú nativo.
+ *   3. Si tampoco hay menú nativo: copiar el link al portapapeles.
  */
 export function CompartirImagenButton({
   endpoint,
   titulo,
   nombreBase,
   cacheBust = true,
+  url,
+  precargar = false,
+  descargarEnEscritorio = true,
 }: {
   endpoint: string;
   titulo: string;
   nombreBase: string;
-  /** true: pide siempre la imagen fresca (para datos que cambian, ej. fixture).
-   *  false: deja que Cloudflare la cachee (para contenido estable, ej. noticias). */
+  /** true: pide siempre la imagen fresca (datos que cambian, ej. fixture).
+   *  false: deja que se cachee (contenido estable, ej. noticias). */
   cacheBust?: boolean;
+  /** Link a compartir cuando no se puede compartir el archivo (ruta o URL). */
+  url?: string;
+  /** Baja la imagen apenas se muestra el botón, así el toque comparte al
+   *  instante (los celulares exigen que compartir ocurra dentro del toque). */
+  precargar?: boolean;
+  /** Si no se puede compartir el archivo: true = se descarga la imagen. */
+  descargarEnEscritorio?: boolean;
 }) {
-  const [estado, setEstado] = useState<"idle" | "cargando" | "error">("idle");
+  const [estado, setEstado] = useState<"idle" | "cargando" | "error" | "copiado">("idle");
+  const precargada = useRef<Promise<Blob> | null>(null);
 
-  async function pedirImagen(): Promise<Blob> {
-    const url = cacheBust
+  function pedirImagen(): Promise<Blob> {
+    const dir = cacheBust
       ? `${endpoint}${endpoint.includes("?") ? "&" : "?"}t=${Date.now()}`
       : endpoint;
-    // El generador de imágenes puede devolver 503 puntualmente por límite de
-    // CPU del Worker; se reintenta un par de veces con una pausa corta.
-    for (let intento = 0; intento < 3; intento++) {
-      const res = await fetch(url);
-      if (res.ok) return res.blob();
-      if (intento < 2) await new Promise((r) => setTimeout(r, 1600));
-    }
-    throw new Error("No se pudo generar la imagen");
+    // El generador puede devolver 503 puntualmente: se reintenta un par de veces.
+    return (async () => {
+      for (let intento = 0; intento < 3; intento++) {
+        const res = await fetch(dir);
+        if (res.ok) return res.blob();
+        if (intento < 2) await new Promise((r) => setTimeout(r, 1600));
+      }
+      throw new Error("No se pudo generar la imagen");
+    })();
   }
+
+  useEffect(() => {
+    if (!precargar) return;
+    const p = pedirImagen();
+    p.catch(() => {
+      precargada.current = null;
+    });
+    precargada.current = p;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endpoint, precargar]);
 
   async function compartir() {
     setEstado("cargando");
     try {
-      const blob = await pedirImagen();
-      const nombreArchivo = `${nombreBase.replace(/[^\w\s-]/g, "").trim() || "imagen"}.png`;
+      const blob = await (precargada.current ?? pedirImagen());
+      const limpio = nombreBase
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .trim();
+      const nombreArchivo = `${limpio || "imagen"}.png`;
       const file = new File([blob], nombreArchivo, { type: "image/png" });
+      const link = url
+        ? new URL(url, window.location.origin).toString()
+        : window.location.href;
 
-      if (
-        typeof navigator.canShare === "function" &&
-        navigator.canShare({ files: [file] })
-      ) {
+      if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: titulo });
-      } else {
-        const url = URL.createObjectURL(blob);
+        setEstado("idle");
+        return;
+      }
+
+      if (descargarEnEscritorio) {
+        const obj = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url;
+        a.href = obj;
         a.download = nombreArchivo;
         document.body.appendChild(a);
         a.click();
         a.remove();
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(obj);
+        setEstado("idle");
+        return;
       }
-      setEstado("idle");
+
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: titulo, url: link });
+        setEstado("idle");
+        return;
+      }
+
+      await navigator.clipboard.writeText(link);
+      setEstado("copiado");
+      setTimeout(() => setEstado("idle"), 2500);
     } catch (e) {
+      // El usuario cerró el menú nativo — no es un error.
       if (e instanceof DOMException && e.name === "AbortError") {
         setEstado("idle");
         return;
@@ -80,7 +128,9 @@ export function CompartirImagenButton({
         ? "Generando imagen…"
         : estado === "error"
           ? "Error, reintentá"
-          : "Compartir imagen"}
+          : estado === "copiado"
+            ? "Link copiado"
+            : "Compartir imagen"}
     </button>
   );
 }
