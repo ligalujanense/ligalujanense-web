@@ -24,7 +24,7 @@ type P = {
 };
 
 function medidas(n: number) {
-  if (n <= 1) return { escudo: 250, nombre: 50, marcador: 84, col: 380, centro: 200 };
+  if (n <= 1) return { escudo: 350, nombre: 56, marcador: 100, col: 380, centro: 200 };
   if (n <= 2) return { escudo: 190, nombre: 42, marcador: 66, col: 380, centro: 200 };
   if (n === 3) return { escudo: 160, nombre: 37, marcador: 58, col: 380, centro: 190 };
   if (n === 4) return { escudo: 128, nombre: 31, marcador: 48, col: 370, centro: 180 };
