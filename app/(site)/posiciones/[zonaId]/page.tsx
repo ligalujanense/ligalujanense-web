@@ -109,7 +109,14 @@ export default async function PosicionesZonaPage({
           </h1>
           <p className="text-neutral-500 text-sm">{zona.temporada}</p>
         </div>
-        <ShareButtons title={`Posiciones ${zona.nombre}`} path={`/posiciones/${zona.id}`} />
+        <ShareButtons
+          title={`Posiciones ${zona.nombre}`}
+          path={`/posiciones/${zona.id}`}
+          imagen={{
+            endpoint: `/api/posiciones-imagen/${zona.id}`,
+            nombreBase: `Posiciones ${zona.nombre}`,
+          }}
+        />
       </div>
 
       {tabla.length > 0 ? (
