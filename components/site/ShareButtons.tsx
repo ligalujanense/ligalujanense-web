@@ -14,7 +14,8 @@ type Red = "WhatsApp" | "Instagram" | "Facebook" | "X";
  * - Con `imagen`: WhatsApp, Instagram, Facebook y X generan la imagen y la
  *   comparten (en el celular abre el menú del sistema con la imagen adjunta, ahí
  *   se elige la app o la historia/estado; en computadora se descarga). No se
- *   manda el link. Solo "Copiar link" copia el link.
+ *   manda el link, salvo con `imagen.incluirLink` (noticias): ahí el link va como
+ *   texto con la imagen y queda copiado. Si no, solo "Copiar link" copia el link.
  * - Sin `imagen`: WhatsApp, Facebook y X comparten el link como siempre.
  */
 export function ShareButtons({

@@ -20,6 +20,10 @@ export type OpcionesImagen = {
   precargar?: boolean;
   /** Si no se puede compartir el archivo: true = se descarga la imagen. */
   descargarEnEscritorio?: boolean;
+  /** true: junto con la imagen se manda el título + el link como texto y el link
+   *  queda copiado en el portapapeles (para apps que descartan el texto, ej. las
+   *  historias de Instagram). Solo para noticias. */
+  incluirLink?: boolean;
 };
 
 export type EstadoCompartir = "idle" | "cargando" | "error" | "copiado";
@@ -43,6 +47,7 @@ export function useCompartirImagen(
     cacheBust = false,
     precargar = false,
     descargarEnEscritorio = true,
+    incluirLink = false,
   }: OpcionesImagen,
   /** false: el hook no hace nada (para páginas sin imagen). */
   habilitado = true
@@ -91,9 +96,32 @@ export function useCompartirImagen(
         ? new URL(url, window.location.origin).toString()
         : window.location.href;
 
+      // Con incluirLink: el link va como texto de la compartida y además queda copiado.
+      // No se espera la copia antes de abrir el menú: iOS exige compartir dentro del toque.
+      const copia: Promise<boolean> = incluirLink
+        ? Promise.resolve()
+            .then(() => navigator.clipboard.writeText(link))
+            .then(
+            () => true,
+            () => false
+          )
+        : Promise.resolve(false);
+      const terminar = async () => {
+        if (await copia) {
+          setEstado("copiado");
+          setTimeout(() => setEstado("idle"), 2500);
+        } else {
+          setEstado("idle");
+        }
+      };
+
       if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: titulo });
-        setEstado("idle");
+        await navigator.share(
+          incluirLink
+            ? { files: [file], title: titulo, text: [titulo, link].join("\n") }
+            : { files: [file], title: titulo }
+        );
+        await terminar();
         return;
       }
 
@@ -106,7 +134,7 @@ export function useCompartirImagen(
         a.click();
         a.remove();
         URL.revokeObjectURL(obj);
-        setEstado("idle");
+        await terminar();
         return;
       }
 

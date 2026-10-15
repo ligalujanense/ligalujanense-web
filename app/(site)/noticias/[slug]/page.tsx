@@ -77,6 +77,7 @@ export default async function NoticiaDetallePage({
           nombreBase: noticia.titulo,
           cacheBust: false,
           precargar: true,
+          incluirLink: true,
         }}
       />
       {noticia.imagen_url ? (
