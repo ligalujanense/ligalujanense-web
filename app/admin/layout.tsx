@@ -29,9 +29,10 @@ export default async function AdminLayout({
   const links = usuario?.rol === "admin" ? linksAdminGeneral : linksEncargado;
 
   return (
-    <div className="min-h-screen bg-crema flex">
+    <div className="min-h-screen bg-crema md:flex">
       <AdminSidebar links={links} rol={usuario?.rol ?? ""} />
-      <main className="flex-1 p-6 min-w-0">{children}</main>
+      {/* En celulares el contenido baja para no quedar debajo de la barra fija. */}
+      <main className="admin-contenido flex-1 min-w-0 p-4 pt-20 md:p-6">{children}</main>
     </div>
   );
 }

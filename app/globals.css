@@ -34,3 +34,22 @@ body {
     transform: translateX(-50%);
   }
 }
+
+/* Panel admin en celulares: que los campos de los formularios no se salgan de su
+   tarjeta ni queden cortados a la derecha. */
+@media (max-width: 767px) {
+  .admin-contenido label > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .admin-contenido label > select,
+  .admin-contenido label > textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .admin-contenido label {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .admin-contenido form {
+    max-width: 100%;
+  }
+}
