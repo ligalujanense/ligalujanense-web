@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { canManageZona } from "@/lib/supabase/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { equiposDeZona, zonaDeFecha, zonaDePartido } from "@/lib/permisos-zona";
 
 export async function crearFecha(zonaId: string, formData: FormData) {
   if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
@@ -36,6 +37,11 @@ export async function crearPartido(zonaId: string, formData: FormData) {
     return { error: "Elegí local y visitante, o el equipo libre" };
   }
   if (!libre_equipo_id && !fecha) return { error: "Elegí el día del partido" };
+  // La jornada y los equipos tienen que ser de ESTA zona.
+  if ((await zonaDeFecha(fixture_fecha_id)) !== zonaId) return { error: "No autorizado" };
+  if (!(await equiposDeZona(zonaId, [equipo_local_id, equipo_visitante_id, libre_equipo_id]))) {
+    return { error: "No autorizado" };
+  }
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("partidos").insert({
@@ -56,6 +62,7 @@ export async function crearPartido(zonaId: string, formData: FormData) {
 
 export async function editarPartido(zonaId: string, id: string, formData: FormData) {
   if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
+  if ((await zonaDePartido(id)) !== zonaId) return { error: "No autorizado" };
 
   const equipo_local_id = String(formData.get("equipo_local_id") ?? "") || null;
   const equipo_visitante_id = String(formData.get("equipo_visitante_id") ?? "") || null;
@@ -68,6 +75,9 @@ export async function editarPartido(zonaId: string, id: string, formData: FormDa
     return { error: "Elegí local y visitante, o el equipo libre" };
   }
   if (!libre_equipo_id && !fecha) return { error: "Elegí el día del partido" };
+  if (!(await equiposDeZona(zonaId, [equipo_local_id, equipo_visitante_id, libre_equipo_id]))) {
+    return { error: "No autorizado" };
+  }
 
   const supabase = createAdminClient();
   const { error } = await supabase
@@ -93,7 +103,11 @@ export async function eliminarFecha(zonaId: string, id: string) {
   if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("fixture_fechas").delete().eq("id", id);
+  const { error } = await supabase
+    .from("fixture_fechas")
+    .delete()
+    .eq("id", id)
+    .eq("zona_id", zonaId);
   if (error) return { error: error.message };
 
   revalidatePath(`/admin/fixture/${zonaId}`);
@@ -102,6 +116,7 @@ export async function eliminarFecha(zonaId: string, id: string) {
 
 export async function eliminarPartido(zonaId: string, id: string) {
   if (!(await canManageZona(zonaId))) return { error: "No autorizado" };
+  if ((await zonaDePartido(id)) !== zonaId) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("partidos").delete().eq("id", id);

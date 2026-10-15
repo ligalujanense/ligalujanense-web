@@ -30,7 +30,11 @@ function LoginForm() {
       return;
     }
 
-    router.push(searchParams.get("next") || "/admin");
+    // Solo rutas internas: "?next=https://otro-sitio" o "//otro-sitio" llevarían
+    // al usuario recién logueado a una página falsa.
+    const next = searchParams.get("next") ?? "";
+    const destino = /^\/(?![/\\])/.test(next) ? next : "/admin";
+    router.push(destino);
     router.refresh();
   }
 

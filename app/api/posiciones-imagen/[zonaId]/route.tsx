@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
 import { calcularPosiciones } from "@/lib/posiciones";
+import { imagenConCache } from "@/lib/og-cache";
 
 // Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
 export const maxDuration = 30;
@@ -93,7 +94,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ zonaId: string
   const tNombre = rowH >= 100 ? 30 : rowH >= 80 ? 26 : 22;
   const tStat = rowH >= 100 ? 30 : rowH >= 80 ? 27 : 23;
 
-  return new ImageResponse(
+  return imagenConCache({
+    carpeta: "posiciones",
+    clave: zona.id,
+    datos: { nombre: zona.nombre, temporada: zona.temporada, tabla },
+    cacheControl: "public, max-age=60, s-maxage=60",
+    dibujar: () => new ImageResponse(
     (
       <div
         style={{
@@ -252,10 +258,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ zonaId: string
         <BloqueSponsors />
       </div>
     ),
-    {
-      width: 1080,
-      height: 1920,
-      headers: { "Cache-Control": "public, max-age=60, s-maxage=60" },
-    }
-  );
+    { width: 1080, height: 1920 }
+  ),
+  });
 }

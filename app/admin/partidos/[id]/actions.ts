@@ -3,16 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { canManageZona, getUsuario } from "@/lib/supabase/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-async function zonaDelPartido(partidoId: string) {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("partidos")
-    .select("fixture_fechas ( zona_id )")
-    .eq("id", partidoId)
-    .single();
-  return (data as any)?.fixture_fechas?.zona_id as string | undefined;
-}
+import {
+  equipoJuegaPartido,
+  rutaPlanilla,
+  zonaDePartido as zonaDelPartido,
+} from "@/lib/permisos-zona";
 
 export async function guardarResultado(partidoId: string, formData: FormData) {
   const zonaId = await zonaDelPartido(partidoId);
@@ -46,6 +41,7 @@ export async function agregarGol(partidoId: string, formData: FormData) {
   const jugador = String(formData.get("jugador") ?? "").trim();
   const minuto = formData.get("minuto");
   if (!jugador) return { error: "Falta el jugador" };
+  if (!(await equipoJuegaPartido(partidoId, equipo_id))) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("goles").insert({
@@ -64,7 +60,8 @@ export async function eliminarGol(partidoId: string, id: string) {
   if (!zonaId || !(await canManageZona(zonaId))) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
-  await supabase.from("goles").delete().eq("id", id);
+  // .eq("partido_id") impide borrar un gol de otro partido (de otra zona).
+  await supabase.from("goles").delete().eq("id", id).eq("partido_id", partidoId);
   revalidatePath(`/admin/partidos/${partidoId}`);
 }
 
@@ -78,6 +75,7 @@ export async function agregarTarjeta(partidoId: string, formData: FormData) {
   const minuto = formData.get("minuto");
   const motivo = String(formData.get("motivo") ?? "").trim();
   if (!jugador) return { error: "Falta el jugador" };
+  if (!(await equipoJuegaPartido(partidoId, equipo_id))) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("tarjetas").insert({
@@ -98,7 +96,7 @@ export async function eliminarTarjeta(partidoId: string, id: string) {
   if (!zonaId || !(await canManageZona(zonaId))) return { error: "No autorizado" };
 
   const supabase = createAdminClient();
-  await supabase.from("tarjetas").delete().eq("id", id);
+  await supabase.from("tarjetas").delete().eq("id", id).eq("partido_id", partidoId);
   revalidatePath(`/admin/partidos/${partidoId}`);
 }
 
@@ -109,6 +107,9 @@ export async function guardarPlanilla(
 ) {
   const zonaId = await zonaDelPartido(partidoId);
   if (!zonaId || !(await canManageZona(zonaId))) return { error: "No autorizado" };
+  if (!(await equipoJuegaPartido(partidoId, equipoId)) || pdfUrl !== rutaPlanilla(partidoId, equipoId)) {
+    return { error: "No autorizado" };
+  }
 
   const usuario = await getUsuario();
   const supabase = createAdminClient();

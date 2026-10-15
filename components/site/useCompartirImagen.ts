@@ -11,8 +11,9 @@ export type OpcionesImagen = {
   nombreBase: string;
   /** Link a compartir si no se puede compartir el archivo (ruta o URL). */
   url?: string;
-  /** true: pide siempre la imagen fresca (datos que cambian, ej. fixture).
-   *  false: deja que se cachee (contenido estable, ej. noticias). */
+  /** true: agrega ?t=… para saltear toda caché. Por defecto false: las rutas
+   *  de imagen ya detectan solas si los datos cambiaron y si no, devuelven la
+   *  imagen guardada (generarla de nuevo en cada pedido es caro). */
   cacheBust?: boolean;
   /** Baja la imagen apenas se muestra el botón, así el toque comparte al
    *  instante (los celulares exigen que compartir ocurra dentro del toque). */
@@ -39,7 +40,7 @@ export function useCompartirImagen(
     titulo,
     nombreBase,
     url,
-    cacheBust = true,
+    cacheBust = false,
     precargar = false,
     descargarEnEscritorio = true,
   }: OpcionesImagen,

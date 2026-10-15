@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
 import { diaLargo, diaPartes } from "@/lib/dias";
+import { imagenConCache } from "@/lib/og-cache";
 
 // Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
 export const maxDuration = 30;
@@ -125,6 +126,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   if (!fecha) return new Response("Fecha no encontrada", { status: 404 });
 
   const f = fecha as any;
+  // Un ?partido= que no es de esta fecha no genera nada (ni imagen vacía guardada).
+  if (soloPartido && !(f.partidos ?? []).some((p: any) => p.id === soloPartido)) {
+    return new Response("Partido no encontrado", { status: 404 });
+  }
   const zonaNombre: string = f.zonas?.nombre ?? "";
   const numeroFecha: number = f.numero_fecha;
 
@@ -155,7 +160,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // Con un solo partido sobra espacio: fecha y estadio van en tamaño grande.
   const solo = partidos.length <= 1;
 
-  return new ImageResponse(
+  return imagenConCache({
+    carpeta: "fechas",
+    clave: soloPartido ? `${id}-p-${soloPartido}` : id,
+    datos: { zonaNombre, numeroFecha, partidos },
+    cacheControl: "public, max-age=60, s-maxage=60",
+    dibujar: () => new ImageResponse(
     (
       <div
         style={{
@@ -373,10 +383,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         <BloqueSponsors />
       </div>
     ),
-    {
-      width: 1080,
-      height: 1920,
-      headers: { "Cache-Control": "public, max-age=60, s-maxage=60" },
-    }
-  );
+    { width: 1080, height: 1920 }
+  ),
+  });
 }
