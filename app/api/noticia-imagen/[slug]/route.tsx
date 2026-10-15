@@ -13,7 +13,10 @@ const BUCKET = "imagenes";
 const OSCURO = "#0d1b24";
 const DORADO = "#D9A441";
 
-const CACHE = "public, max-age=3600, s-maxage=31536000";
+// Caché corta a propósito: la ruta es barata (devuelve el PNG ya guardado en Storage)
+// y así un cambio de título, foto o encuadre se ve enseguida, sin quedar pegada una
+// versión vieja en el navegador o en el CDN.
+const CACHE = "public, max-age=0, s-maxage=30, must-revalidate";
 
 // Subir este número cada vez que cambie el diseño del collage: cambia el nombre
 // de los archivos guardados y todas las noticias se regeneran solas.
@@ -243,9 +246,22 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
   // 2) primera vez -> se genera, se guarda en Supabase y se devuelve.
   const { buf, completo } = await generar({ ...(noticia as Noticia), foco_x: fx, foco_y: fy });
   if (completo) {
-    await supabase.storage
+    const { error } = await supabase.storage
       .from(BUCKET)
       .upload(path, buf, { contentType: "image/png", upsert: true });
+
+    // Limpieza: versiones anteriores de esta misma noticia.
+    if (!error) {
+      const nombre = `${slug}-${version}.png`;
+      const { data: lista } = await supabase.storage
+        .from(BUCKET)
+        .list("og/noticias", { search: `${slug}-`, limit: 100 });
+      const viejas = (lista ?? [])
+        .map((f) => f.name)
+        .filter((n) => n !== nombre && n.startsWith(`${slug}-`) && /^[a-z0-9]+\.png$/.test(n.slice(slug.length + 1)))
+        .map((n) => `og/noticias/${n}`);
+      if (viejas.length) await supabase.storage.from(BUCKET).remove(viejas);
+    }
   }
 
   return new Response(buf, {
