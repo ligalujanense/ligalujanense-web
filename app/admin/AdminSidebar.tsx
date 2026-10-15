@@ -69,7 +69,9 @@ export function AdminSidebar({
       )}
 
       <aside
-        className={`fixed md:sticky top-0 left-0 z-50 h-screen w-64 md:w-56 shrink-0 bg-white border-r border-neutral-200 flex flex-col justify-between transition-transform duration-200 ${
+        // h-dvh: en celulares 100vh incluye lo que tapa la barra del navegador y
+        // dejaba "Cerrar sesión" fuera de la pantalla.
+        className={`fixed md:sticky top-0 left-0 z-50 h-dvh md:h-screen w-64 md:w-56 shrink-0 bg-white border-r border-neutral-200 flex flex-col justify-between transition-transform duration-200 ${
           abierto ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -108,7 +110,7 @@ export function AdminSidebar({
           </nav>
         </div>
 
-        <div className="border-t border-neutral-200 px-4 py-3 flex flex-col gap-2 text-sm">
+        <div className="border-t border-neutral-200 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2 text-sm">
           <span className="text-[11px] uppercase tracking-wide text-neutral-400">{rol}</span>
           <Link href="/" className="text-neutral-600 hover:text-celeste-oscuro font-semibold">
             ← Ir al sitio
