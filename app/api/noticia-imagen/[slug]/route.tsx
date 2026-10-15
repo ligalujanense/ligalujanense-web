@@ -20,7 +20,7 @@ const CACHE = "public, max-age=0, s-maxage=30, must-revalidate";
 
 // Subir este número cada vez que cambie el diseño del collage: cambia el nombre
 // de los archivos guardados y todas las noticias se regeneran solas.
-const VERSION_DISENO = "v1";
+const VERSION_DISENO = "v2";
 
 // Hash corto y estable del contenido: si cambia el título, la foto o el diseño,
 // cambia el nombre del archivo guardado y se vuelve a generar en la próxima compartida.
@@ -115,13 +115,29 @@ async function generar(
             alt=""
           />
         )}
+        {/* Arriba: oscurece detrás del logo. */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 380,
+            display: "flex",
+            background: "linear-gradient(to bottom, rgba(13,27,36,0.7) 0%, rgba(13,27,36,0) 100%)",
+          }}
+        />
+        {/* Abajo: degradado fuerte que arranca alto, así el título se lee sobre cualquier foto. */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 1050,
             display: "flex",
             background:
-              "linear-gradient(to top, rgba(13,27,36,0.97) 0%, rgba(13,27,36,0.15) 42%, rgba(13,27,36,0.72) 100%)",
+              "linear-gradient(to top, rgba(13,27,36,0.96) 0%, rgba(13,27,36,0.88) 30%, rgba(13,27,36,0.55) 62%, rgba(13,27,36,0) 100%)",
           }}
         />
 
@@ -184,19 +200,22 @@ async function generar(
           <span
             style={{
               color: "#ffffff",
-              fontSize: 76,
+              fontSize: 80,
               fontWeight: 800,
               lineHeight: 1.1,
               marginTop: 28,
+              // Sombra para que cada letra se distinga aun sobre zonas claras.
+              textShadow: "0 4px 18px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.9)",
             }}
           >
             {titulo}
           </span>
           <span
             style={{
-              color: "rgba(255,255,255,0.62)",
-              fontSize: 31,
+              color: "rgba(255,255,255,0.92)",
+              fontSize: 32,
               marginTop: 22,
+              textShadow: "0 2px 10px rgba(0,0,0,0.9)",
               textTransform: "capitalize",
             }}
           >
