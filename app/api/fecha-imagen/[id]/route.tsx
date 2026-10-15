@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
-import { diaLargo } from "@/lib/dias";
+import { diaLargo, diaPartes } from "@/lib/dias";
 
 // Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
 export const maxDuration = 30;
@@ -15,6 +15,9 @@ const GRIS = "#737373";
 type P = {
   /** Día de ESTE partido (los de una misma fecha se juegan en días distintos). */
   dia: string | null;
+  /** Para el diseño grande de un solo partido: "SÁBADO" y "17 de Octubre". */
+  diaSemana: string | null;
+  diaResto: string | null;
   libre: string | null;
   localNombre: string;
   localLogo: string | null;
@@ -134,6 +137,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     )
     .map((p: any) => ({
     dia: diaLargo(p.fecha ?? f.fecha),
+    diaSemana: diaPartes(p.fecha ?? f.fecha)?.semana ?? null,
+    diaResto: diaPartes(p.fecha ?? f.fecha)?.resto ?? null,
     libre: p.libre_equipo?.clubes?.nombre ?? null,
     localNombre: p.equipo_local?.clubes?.nombre ?? "?",
     localLogo: CLUB_LOGOS[p.equipo_local?.club_id ?? ""] ?? null,
@@ -147,6 +152,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }));
 
   const m = medidas(partidos.length || 1);
+  // Con un solo partido sobra espacio: fecha y estadio van en tamaño grande.
+  const solo = partidos.length <= 1;
 
   return new ImageResponse(
     (
@@ -220,7 +227,34 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                 borderTop: i === 0 ? "0px solid #eee" : "1px solid #eeeeee",
               }}
             >
-              {!p.libre && p.dia && (
+              {!p.libre && solo && p.diaSemana && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginBottom: 56,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 66,
+                      fontWeight: 800,
+                      letterSpacing: 10,
+                      color: DORADO,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {p.diaSemana}
+                  </span>
+                  <span
+                    style={{ fontSize: 96, fontWeight: 800, color: CELESTE, lineHeight: 1.1 }}
+                  >
+                    {p.diaResto}
+                  </span>
+                </div>
+              )}
+              {!p.libre && !solo && p.dia && (
                 <span
                   style={{
                     fontSize: 30,
@@ -275,7 +309,33 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                   <Equipo nombre={p.visitanteNombre} logo={p.visitanteLogo} m={m} />
                 </div>
               )}
-              {!p.libre && p.estadio && (
+              {!p.libre && p.estadio && solo && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginTop: 56,
+                    width: 880,
+                  }}
+                >
+                  <span style={{ fontSize: 44, fontWeight: 800, color: "#374151" }}>
+                    Estadio:
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 46,
+                      color: "#4b5563",
+                      textAlign: "center",
+                      lineHeight: 1.2,
+                      marginTop: 6,
+                    }}
+                  >
+                    {p.estadio}
+                  </span>
+                </div>
+              )}
+              {!p.libre && p.estadio && !solo && (
                 <div
                   style={{
                     display: "flex",

@@ -27,3 +27,16 @@ export function diaCorto(iso: string | null | undefined): string | null {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   return `${nombre} ${dd}/${mm}`;
 }
+
+/** Para los diseños grandes: { semana: "SÁBADO", resto: "17 de Octubre" } */
+export function diaPartes(
+  iso: string | null | undefined
+): { semana: string; resto: string } | null {
+  if (!iso) return null;
+  const d = aFecha(iso);
+  const mes = d.toLocaleDateString("es-AR", { month: "long" });
+  return {
+    semana: d.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase(),
+    resto: `${d.getDate()} de ${mes.charAt(0).toUpperCase()}${mes.slice(1)}`,
+  };
+}
