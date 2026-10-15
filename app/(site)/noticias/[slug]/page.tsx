@@ -49,12 +49,19 @@ export default async function NoticiaDetallePage({
   const supabase = await createClient();
   const { data: noticia } = await supabase
     .from("noticias")
-    .select("titulo, contenido, imagen_url, created_at")
+    .select("*")
     .eq("slug", slug)
     .eq("publicado", true)
     .single();
 
   if (!noticia) notFound();
+
+  // Versión de la imagen para compartir: si cambia el título, la foto o el encuadre
+  // cambia el link, y ninguna caché del navegador puede servir una imagen vieja.
+  const huella = `${noticia.titulo}|${noticia.imagen_url ?? ""}|${noticia.foco_x ?? 50},${noticia.foco_y ?? 50}`;
+  let h = 5381;
+  for (let i = 0; i < huella.length; i++) h = ((h << 5) + h + huella.charCodeAt(i)) >>> 0;
+  const versionImagen = h.toString(36);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-4">
@@ -66,7 +73,7 @@ export default async function NoticiaDetallePage({
         title={noticia.titulo}
         path={`/noticias/${slug}`}
         imagen={{
-          endpoint: `/api/noticia-imagen/${slug}`,
+          endpoint: `/api/noticia-imagen/${slug}?v=${versionImagen}`,
           nombreBase: noticia.titulo,
           cacheBust: false,
           precargar: true,
