@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
+import { diaLargo } from "@/lib/dias";
 
 // Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
 export const maxDuration = 30;
@@ -12,6 +13,8 @@ const DORADO = "#B5842E";
 const GRIS = "#737373";
 
 type P = {
+  /** Día de ESTE partido (los de una misma fecha se juegan en días distintos). */
+  dia: string | null;
   libre: string | null;
   localNombre: string;
   localLogo: string | null;
@@ -107,7 +110,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     .select(
       `numero_fecha, fecha, zonas ( nombre ),
        partidos (
-         id, hora, estadio, estado, resultado_local, resultado_visitante,
+         id, fecha, hora, estadio, estado, resultado_local, resultado_visitante,
          equipo_local:equipo_local_id ( club_id, clubes ( nombre ) ),
          equipo_visitante:equipo_visitante_id ( club_id, clubes ( nombre ) ),
          libre_equipo:libre_equipo_id ( clubes ( nombre ) )
@@ -122,24 +125,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   const zonaNombre: string = f.zonas?.nombre ?? "";
   const numeroFecha: number = f.numero_fecha;
 
-  let fechaTexto = "";
-  if (f.fecha) {
-    const d = new Date(
-      Number(f.fecha.slice(0, 4)),
-      Number(f.fecha.slice(5, 7)) - 1,
-      Number(f.fecha.slice(8, 10))
-    );
-    fechaTexto = d.toLocaleDateString("es-AR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
-    fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
-  }
-
   const partidos: P[] = (f.partidos ?? [])
     .filter((p: any) => !soloPartido || p.id === soloPartido)
+    .sort(
+      (a: any, b: any) =>
+        (a.fecha ?? "9").localeCompare(b.fecha ?? "9") ||
+        (a.hora ?? "").localeCompare(b.hora ?? "")
+    )
     .map((p: any) => ({
+    dia: diaLargo(p.fecha ?? f.fecha),
     libre: p.libre_equipo?.clubes?.nombre ?? null,
     localNombre: p.equipo_local?.clubes?.nombre ?? "?",
     localLogo: CLUB_LOGOS[p.equipo_local?.club_id ?? ""] ?? null,
@@ -192,9 +186,6 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
             >
               Fecha {numeroFecha}
             </span>
-            {fechaTexto && (
-              <span style={{ fontSize: 38, color: GRIS, marginTop: 8 }}>{fechaTexto}</span>
-            )}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -229,6 +220,20 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                 borderTop: i === 0 ? "0px solid #eee" : "1px solid #eeeeee",
               }}
             >
+              {!p.libre && p.dia && (
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    letterSpacing: 3,
+                    color: DORADO,
+                    textTransform: "uppercase",
+                    marginBottom: 20,
+                  }}
+                >
+                  {p.dia}
+                </span>
+              )}
               {p.libre ? (
                 <span style={{ fontSize: m.nombre, color: GRIS }}>{p.libre} — libre</span>
               ) : (

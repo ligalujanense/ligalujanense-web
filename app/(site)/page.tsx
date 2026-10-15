@@ -30,7 +30,7 @@ export default async function Home() {
           .select(
             `numero_fecha, fecha,
              partidos (
-               id, estado, hora, resultado_local, resultado_visitante, libre_equipo_id,
+               id, estado, fecha, hora, resultado_local, resultado_visitante, libre_equipo_id,
                equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
                equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) )
              )`
@@ -51,7 +51,7 @@ export default async function Home() {
           id: partido.id,
           zona: zona.nombre,
           numeroFecha: (fechaActiva as any).numero_fecha,
-          fechaFecha: (fechaActiva as any).fecha,
+          fechaFecha: partido.fecha ?? (fechaActiva as any).fecha,
           local: partido.equipo_local?.clubes?.nombre ?? "?",
           logoLocal: partido.equipo_local?.clubes?.logo_url ?? null,
           visitante: partido.equipo_visitante?.clubes?.nombre ?? "?",

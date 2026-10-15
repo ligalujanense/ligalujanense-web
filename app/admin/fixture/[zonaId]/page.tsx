@@ -23,7 +23,7 @@ export default async function FixtureZonaAdminPage({
     supabase
       .from("fixture_fechas")
       .select(
-        "id, numero_fecha, fecha, partidos ( id, equipo_local_id, equipo_visitante_id, libre_equipo_id, hora, estadio, estado, resultado_local, resultado_visitante )"
+        "id, numero_fecha, fecha, partidos ( id, equipo_local_id, equipo_visitante_id, libre_equipo_id, fecha, hora, estadio, estado, resultado_local, resultado_visitante )"
       )
       .eq("zona_id", zonaId)
       .order("numero_fecha"),

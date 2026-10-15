@@ -18,7 +18,7 @@ type FechaConPartidos = {
   partidos: unknown[];
 };
 
-type PartidoVisible = { estado: string };
+type PartidoVisible = { estado: string; fecha?: string | null };
 type FechaConFecha = {
   fecha: string | null;
   partidos: PartidoVisible[];
@@ -42,7 +42,11 @@ export function soloVigentes<T extends FechaConFecha>(fechas: T[], hoy = hoyArge
   return fechas.map((f) => ({
     ...f,
     partidos: f.partidos.filter(
-      (p) => p.estado === "jugado" || !f.fecha || f.fecha >= hoy
+      (p) => {
+        // Cada partido tiene su propio día; si no lo tiene, vale el de la jornada.
+        const dia = p.fecha ?? f.fecha;
+        return p.estado === "jugado" || !dia || dia >= hoy;
+      }
     ),
   }));
 }

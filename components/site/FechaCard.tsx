@@ -2,6 +2,8 @@ import { ShareButtons } from "@/components/site/ShareButtons";
 
 export type PartidoFechaCard = {
   id: string;
+  /** Día del partido ya formateado (ej. "Sábado 12 de septiembre"). */
+  dia?: string | null;
   hora: string | null;
   estadio: string | null;
   estado: string;
@@ -41,7 +43,7 @@ export function FechaCard({
   fechaId: string;
   zonaNombre: string;
   numeroFecha: number;
-  fechaTexto: string | null;
+  fechaTexto?: string | null;
   partidos: PartidoFechaCard[];
   path: string;
 }) {
@@ -61,6 +63,11 @@ export function FechaCard({
               <p className="text-neutral-500 text-sm">{partido.libreNombre} — libre</p>
             ) : (
               <>
+                {partido.dia && (
+                  <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-dorado-oscuro">
+                    {partido.dia}
+                  </span>
+                )}
                 <div className="w-full flex items-center justify-center gap-4 sm:gap-8">
                   <EquipoBloque nombre={partido.local?.nombre ?? "?"} logoUrl={partido.local?.logoUrl ?? null} />
 

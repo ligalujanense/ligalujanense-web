@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FechaCard, type PartidoFechaCard } from "@/components/site/FechaCard";
+import { diaLargo } from "@/lib/dias";
 
 export default async function FixtureZonaPage({
   params,
@@ -23,7 +24,7 @@ export default async function FixtureZonaPage({
     .select(
       `id, numero_fecha, fecha,
        partidos (
-         id, hora, estadio, estado, resultado_local, resultado_visitante,
+         id, fecha, hora, estadio, estado, resultado_local, resultado_visitante,
          equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
          equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) ),
          libre_equipo:libre_equipo_id ( clubes ( nombre ) )
@@ -47,16 +48,9 @@ export default async function FixtureZonaPage({
       {fechas && fechas.length > 0 ? (
         <div className="flex flex-col gap-10">
           {fechas.map((fecha: any) => {
-            const fechaTexto: string | null = fecha.fecha
-              ? new Date(
-                  Number(fecha.fecha.slice(0, 4)),
-                  Number(fecha.fecha.slice(5, 7)) - 1,
-                  Number(fecha.fecha.slice(8, 10))
-                ).toLocaleDateString("es-AR", { weekday: "long", day: "2-digit", month: "long" })
-              : null;
-
-            const partidos: PartidoFechaCard[] = (fecha.partidos ?? []).map((partido: any) => ({
+            const partidos: PartidoFechaCard[] = [...(fecha.partidos ?? [])].sort((a: any, b: any) => (a.fecha ?? "9").localeCompare(b.fecha ?? "9") || (a.hora ?? "").localeCompare(b.hora ?? "")).map((partido: any) => ({
               id: partido.id,
+              dia: diaLargo(partido.fecha ?? fecha.fecha),
               hora: partido.hora,
               estadio: partido.estadio,
               estado: partido.estado,
@@ -77,7 +71,6 @@ export default async function FixtureZonaPage({
                 fechaId={fecha.id}
                 zonaNombre={zona.nombre}
                 numeroFecha={fecha.numero_fecha}
-                fechaTexto={fechaTexto}
                 partidos={partidos}
                 path={`/fechas/${fecha.id}`}
               />

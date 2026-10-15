@@ -13,7 +13,7 @@ export default async function PartidoPage({
   const { data: partido } = await supabase
     .from("partidos")
     .select(
-      `id, fixture_fecha_id, hora, estadio, estado, resultado_local, resultado_visitante,
+      `id, fixture_fecha_id, fecha, hora, estadio, estado, resultado_local, resultado_visitante,
        fixture_fechas ( numero_fecha, fecha, zonas ( nombre ) ),
        equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
        equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) )`
@@ -26,7 +26,8 @@ export default async function PartidoPage({
   const fechaInfo = (partido as any).fixture_fechas;
   const zonaNombre = fechaInfo?.zonas?.nombre ?? "";
   const numeroFecha = fechaInfo?.numero_fecha;
-  const fechaFecha: string | null = fechaInfo?.fecha ?? null;
+  // El día es el del partido; si no lo tiene, el de la jornada.
+  const fechaFecha: string | null = (partido as any).fecha ?? fechaInfo?.fecha ?? null;
   const local = (partido as any).equipo_local?.clubes;
   const visitante = (partido as any).equipo_visitante?.clubes;
 

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FechaCard, type PartidoFechaCard } from "@/components/site/FechaCard";
+import { diaLargo } from "@/lib/dias";
 
 export default async function FechaPage({
   params,
@@ -15,7 +16,7 @@ export default async function FechaPage({
     .select(
       `id, numero_fecha, fecha, zonas ( nombre ),
        partidos (
-         id, hora, estadio, estado, resultado_local, resultado_visitante,
+         id, fecha, hora, estadio, estado, resultado_local, resultado_visitante,
          equipo_local:equipo_local_id ( clubes ( nombre, logo_url ) ),
          equipo_visitante:equipo_visitante_id ( clubes ( nombre, logo_url ) ),
          libre_equipo:libre_equipo_id ( clubes ( nombre ) )
@@ -27,17 +28,9 @@ export default async function FechaPage({
   if (!fecha) notFound();
 
   const zonaNombre = (fecha as any).zonas?.nombre ?? "";
-  const fechaFecha: string | null = (fecha as any).fecha ?? null;
-  const fechaTexto = fechaFecha
-    ? new Date(
-        Number(fechaFecha.slice(0, 4)),
-        Number(fechaFecha.slice(5, 7)) - 1,
-        Number(fechaFecha.slice(8, 10))
-      ).toLocaleDateString("es-AR", { weekday: "long", day: "2-digit", month: "long" })
-    : null;
-
-  const partidos: PartidoFechaCard[] = ((fecha as any).partidos ?? []).map((partido: any) => ({
+  const partidos: PartidoFechaCard[] = [...((fecha as any).partidos ?? [])].sort((a: any, b: any) => (a.fecha ?? "9").localeCompare(b.fecha ?? "9") || (a.hora ?? "").localeCompare(b.hora ?? "")).map((partido: any) => ({
     id: partido.id,
+    dia: diaLargo(partido.fecha ?? (fecha as any).fecha),
     hora: partido.hora,
     estadio: partido.estadio,
     estado: partido.estado,
@@ -58,7 +51,6 @@ export default async function FechaPage({
         fechaId={id}
         zonaNombre={zonaNombre}
         numeroFecha={fecha.numero_fecha}
-        fechaTexto={fechaTexto}
         partidos={partidos}
         path={`/fechas/${id}`}
       />
