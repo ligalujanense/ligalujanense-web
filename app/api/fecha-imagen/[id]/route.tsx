@@ -319,7 +319,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                     width: 880,
                   }}
                 >
-                  <span style={{ fontSize: 44, fontWeight: 800, color: "#374151" }}>
+                  <span style={{ fontSize: 44, fontWeight: 700, color: "#1f2937" }}>
                     Estadio:
                   </span>
                   <span
