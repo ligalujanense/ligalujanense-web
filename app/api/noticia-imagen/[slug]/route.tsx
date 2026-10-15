@@ -1,6 +1,10 @@
 import { ImageResponse } from "next/og";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LIGA_LOGO } from "@/lib/baked-assets.generated";
+import { medidasImagen } from "@/lib/medidas-imagen";
+
+const ANCHO = 1080;
+const ALTO = 1920;
 
 // Vercel: margen de tiempo para renderizar la imagen (el default son 10 s).
 export const maxDuration = 30;
@@ -23,20 +27,56 @@ function hashCorto(s: string): string {
   return h.toString(36);
 }
 
-async function fotoDataUri(url: string): Promise<string | null> {
+async function fotoDataUri(
+  url: string
+): Promise<{ uri: string; medidas: { w: number; h: number } | null } | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.byteLength > 6_000_000) return null;
     const ct = res.headers.get("content-type") ?? "image/jpeg";
-    return `data:${ct};base64,${buf.toString("base64")}`;
+    return {
+      uri: `data:${ct};base64,${buf.toString("base64")}`,
+      medidas: medidasImagen(buf),
+    };
   } catch {
     return null;
   }
 }
 
-type Noticia = { titulo: string; imagen_url: string | null; created_at: string };
+/**
+ * Posición de la foto para cubrir el lienzo mostrando la zona elegida.
+ * (Satori ignora `object-position`, así que se calcula el desplazamiento a mano.)
+ * Centrada o con medidas desconocidas -> recorte centrado normal.
+ */
+function ubicarFoto(
+  medidas: { w: number; h: number } | null,
+  fx: number,
+  fy: number
+): React.CSSProperties {
+  if (!medidas || (fx === 50 && fy === 50)) {
+    return { position: "absolute", inset: 0, objectFit: "cover" };
+  }
+  const escala = Math.max(ANCHO / medidas.w, ALTO / medidas.h);
+  const dw = Math.round(medidas.w * escala);
+  const dh = Math.round(medidas.h * escala);
+  return {
+    position: "absolute",
+    width: dw,
+    height: dh,
+    left: -Math.round(((dw - ANCHO) * fx) / 100),
+    top: -Math.round(((dh - ALTO) * fy) / 100),
+  };
+}
+
+type Noticia = {
+  titulo: string;
+  imagen_url: string | null;
+  created_at: string;
+  foco_x: number;
+  foco_y: number;
+};
 
 // `completo` es false cuando la noticia tiene foto pero no se pudo traer: en ese
 // caso el collage sale sin foto y NO se guarda, para que se reintente la próxima vez.
@@ -67,10 +107,8 @@ async function generar(
         {fondo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={fondo}
-            width={1080}
-            height={1920}
-            style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+            src={fondo.uri}
+            style={ubicarFoto(fondo.medidas, noticia.foco_x, noticia.foco_y)}
             alt=""
           />
         )}
@@ -176,15 +214,21 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
 
   const { data: noticia } = await supabase
     .from("noticias")
-    .select("titulo, imagen_url, created_at")
+    // "*" a propósito: si falta la columna del encuadre, igual se genera centrada.
+    .select("*")
     .eq("slug", slug)
     .eq("publicado", true)
     .single();
 
   if (!noticia) return new Response("Noticia no encontrada", { status: 404 });
 
+  // El encuadre entra en la huella solo si no es el centrado: así las imágenes
+  // ya guardadas (centradas) no se regeneran.
+  const fx = Number.isFinite(noticia.foco_x) ? Number(noticia.foco_x) : 50;
+  const fy = Number.isFinite(noticia.foco_y) ? Number(noticia.foco_y) : 50;
+  const encuadre = fx === 50 && fy === 50 ? "" : `|${fx},${fy}`;
   const version = hashCorto(
-    `${VERSION_DISENO}|${noticia.titulo}|${noticia.imagen_url ?? ""}`
+    `${VERSION_DISENO}|${noticia.titulo}|${noticia.imagen_url ?? ""}${encuadre}`
   );
   const path = `og/noticias/${slug}-${version}.png`;
 
@@ -197,7 +241,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
   }
 
   // 2) primera vez -> se genera, se guarda en Supabase y se devuelve.
-  const { buf, completo } = await generar(noticia as Noticia);
+  const { buf, completo } = await generar({ ...(noticia as Noticia), foco_x: fx, foco_y: fy });
   if (completo) {
     await supabase.storage
       .from(BUCKET)

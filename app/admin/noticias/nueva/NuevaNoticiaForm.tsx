@@ -4,12 +4,15 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { crearNoticia } from "../actions";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { EncuadreHistoria } from "@/components/admin/EncuadreHistoria";
 
 export function NuevaNoticiaForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [imagenUrl, setImagenUrl] = useState("");
   const [imagenUploading, setImagenUploading] = useState(false);
+  const [focoX, setFocoX] = useState(50);
+  const [focoY, setFocoY] = useState(50);
 
   return (
     <form
@@ -38,6 +41,15 @@ export function NuevaNoticiaForm() {
         Imagen
         <ImageUploader pathPrefix="noticias" onUploaded={setImagenUrl} onUploadingChange={setImagenUploading} />
       </label>
+      <EncuadreHistoria
+        imagenUrl={imagenUrl}
+        x={focoX}
+        y={focoY}
+        onChange={(x, y) => {
+          setFocoX(x);
+          setFocoY(y);
+        }}
+      />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="publicado" />
         Publicar ahora

@@ -13,6 +13,11 @@ function slugify(texto: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+function foco(valor: FormDataEntryValue | null) {
+  const n = Number(valor);
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, Math.round(n))) : 50;
+}
+
 export async function crearNoticia(formData: FormData) {
   if (!(await isAdmin())) return { error: "No autorizado" };
 
@@ -30,6 +35,8 @@ export async function crearNoticia(formData: FormData) {
     resumen: resumen || null,
     contenido: contenido || null,
     imagen_url: imagen_url || null,
+    foco_x: foco(formData.get("foco_x")),
+    foco_y: foco(formData.get("foco_y")),
     publicado,
   });
   if (error) return { error: error.message };
@@ -56,6 +63,8 @@ export async function actualizarNoticia(id: string, formData: FormData) {
       resumen: resumen || null,
       contenido: contenido || null,
       imagen_url: imagen_url || null,
+      foco_x: foco(formData.get("foco_x")),
+      foco_y: foco(formData.get("foco_y")),
     })
     .eq("id", id);
   if (error) return { error: error.message };

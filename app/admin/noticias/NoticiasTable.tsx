@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { actualizarNoticia, alternarPublicado, eliminarNoticia } from "./actions";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { EncuadreHistoria } from "@/components/admin/EncuadreHistoria";
 
 type Noticia = {
   id: string;
@@ -11,6 +12,8 @@ type Noticia = {
   resumen: string | null;
   contenido: string | null;
   imagen_url: string | null;
+  foco_x: number | null;
+  foco_y: number | null;
   publicado: boolean;
   created_at: string;
 };
@@ -124,6 +127,8 @@ function NoticiaEditForm({
   const [isPending, startTransition] = useTransition();
   const [imagenUrl, setImagenUrl] = useState(noticia.imagen_url ?? "");
   const [imagenUploading, setImagenUploading] = useState(false);
+  const [focoX, setFocoX] = useState(noticia.foco_x ?? 50);
+  const [focoY, setFocoY] = useState(noticia.foco_y ?? 50);
 
   return (
     <form
@@ -171,6 +176,15 @@ function NoticiaEditForm({
           onUploadingChange={setImagenUploading}
         />
       </label>
+      <EncuadreHistoria
+        imagenUrl={imagenUrl}
+        x={focoX}
+        y={focoY}
+        onChange={(x, y) => {
+          setFocoX(x);
+          setFocoY(y);
+        }}
+      />
       <div className="flex gap-2">
         <button
           type="submit"
