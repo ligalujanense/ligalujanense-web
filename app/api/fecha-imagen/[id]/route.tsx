@@ -238,7 +238,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                 >
                   <span
                     style={{
-                      fontSize: 66,
+                      fontSize: 70,
                       fontWeight: 800,
                       letterSpacing: 10,
                       color: DORADO,
@@ -248,7 +248,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                     {p.diaSemana}
                   </span>
                   <span
-                    style={{ fontSize: 96, fontWeight: 800, color: CELESTE, lineHeight: 1.1 }}
+                    style={{ fontSize: m.nombre, fontWeight: 700, color: CELESTE, lineHeight: 1.1, marginTop: 6 }}
                   >
                     {p.diaResto}
                   </span>
@@ -319,7 +319,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                     width: 880,
                   }}
                 >
-                  <span style={{ fontSize: 44, fontWeight: 700, color: "#1f2937" }}>
+                  <span
+                    style={{
+                      fontSize: 44,
+                      fontWeight: 700,
+                      color: "#1f2937",
+                      WebkitTextStroke: "2px #1f2937",
+                    }}
+                  >
                     Estadio:
                   </span>
                   <span
@@ -348,7 +355,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
                     style={{
                       fontSize: 26,
                       fontWeight: 700,
-                      color: "#374151",
+                      color: "#1f2937",
+                      WebkitTextStroke: "1px #1f2937",
                       marginRight: 8,
                     }}
                   >

@@ -28,15 +28,16 @@ export function diaCorto(iso: string | null | undefined): string | null {
   return `${nombre} ${dd}/${mm}`;
 }
 
-/** Para los diseños grandes: { semana: "SÁBADO", resto: "17 de Octubre" } */
+/** Para los diseños grandes: { semana: "SÁBADO", resto: "17.10.2026" } */
 export function diaPartes(
   iso: string | null | undefined
 ): { semana: string; resto: string } | null {
   if (!iso) return null;
   const d = aFecha(iso);
-  const mes = d.toLocaleDateString("es-AR", { month: "long" });
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
   return {
     semana: d.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase(),
-    resto: `${d.getDate()} de ${mes.charAt(0).toUpperCase()}${mes.slice(1)}`,
+    resto: `${dd}.${mm}.${d.getFullYear()}`,
   };
 }
