@@ -24,7 +24,9 @@ export default async function PartidoFaseFinalPage({
     <main className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-8">
       <div className="flex flex-col items-center gap-1 text-center">
         <span className="uppercase tracking-widest text-xs font-bold text-dorado-oscuro">
-          Fase final{i.tramo ? ` — ${i.ronda} · ${i.tramo}` : ` — ${i.ronda}`}
+          {i.sinFaseFinal ? "" : "Fase final — "}
+          {i.ronda}
+          {i.tramo ? ` · ${i.tramo}` : ""}
         </span>
         {dia && <span className="text-sm text-neutral-500">{dia}</span>}
       </div>

@@ -114,7 +114,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                     textTransform: "uppercase",
                   }}
                 >
-                  {i.tramo ? `Fase final · ${i.tramo}` : "Fase final"}
+                  {i.sinFaseFinal ? (i.tramo ?? "") : i.tramo ? `Fase final · ${i.tramo}` : "Fase final"}
                 </span>
                 <span style={{ fontSize: 104, fontWeight: 800, color: CELESTE, lineHeight: 1.02 }}>
                   {i.ronda}

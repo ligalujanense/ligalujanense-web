@@ -169,5 +169,7 @@ export function infoPartido(c: CruceResuelto, p: PartidoCruce) {
     marcador: marcadorLocalVisitante(p),
     tramo,
     ronda: RONDA_LABEL[c.ronda],
+    /** La Final Anual se presenta sola, sin el rótulo "Fase final". */
+    sinFaseFinal: c.ronda === "final_anual",
   };
 }
