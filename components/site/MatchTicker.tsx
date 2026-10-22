@@ -33,11 +33,11 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
 
   return (
     <Link
-      href={`/partidos/${partido.id}`}
+      href={partido.href ?? `/partidos/${partido.id}`}
       className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
     >
       <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold text-center">
-        {partido.zona} · Fecha {partido.numeroFecha}
+        {partido.etiqueta ?? `${partido.zona} · Fecha ${partido.numeroFecha}`}
         {fechaTexto ? ` · ${fechaTexto}` : ""}
       </span>
       <div className="flex items-center gap-2 w-full justify-center">

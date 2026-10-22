@@ -2,6 +2,10 @@ export type TickerPartido = {
   id: string;
   zona: string;
   numeroFecha: number;
+  /** Fase final: texto de la tarjeta (ej. "1ª Fase · Ida") en lugar de "Zona · Fecha N". */
+  etiqueta?: string;
+  /** Fase final: la tarjeta lleva al cuadro en vez de a /partidos/<id>. */
+  href?: string;
   fechaFecha: string | null;
   local: string;
   logoLocal: string | null;

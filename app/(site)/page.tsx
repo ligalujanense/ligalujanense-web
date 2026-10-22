@@ -3,7 +3,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { MatchTicker } from "@/components/site/MatchTicker";
-import { elegirFechaActiva, soloVigentes, type TickerPartido } from "@/lib/match-ticker";
+import { elegirFechaActiva, hoyArgentina, soloVigentes, type TickerPartido } from "@/lib/match-ticker";
+import { cargarCuadro } from "@/lib/fase-final-data";
+import { tickerFaseFinal } from "@/lib/fase-final-ticker";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -64,6 +66,11 @@ export default async function Home() {
       }
     }
   }
+
+  // Fase final: sus partidos van primero en la cinta mientras haya jornada vigente.
+  const hoy = hoyArgentina();
+  const { cruces } = await cargarCuadro(supabase, "futbol-masculino", hoy.slice(0, 4));
+  tickerPartidos.unshift(...tickerFaseFinal(cruces, hoy));
 
   return (
     <main className="flex flex-col">
