@@ -26,7 +26,7 @@ export type OpcionesImagen = {
   incluirLink?: boolean;
 };
 
-export type EstadoCompartir = "idle" | "cargando" | "error" | "copiado";
+export type EstadoCompartir = "idle" | "cargando" | "error" | "copiado" | "descargado";
 
 /**
  * Genera una imagen y la comparte por el menú nativo del sistema (historia de
@@ -158,5 +158,33 @@ export function useCompartirImagen(
     }
   }
 
-  return { estado, compartir };
+  /** Baja la imagen como archivo PNG, sin abrir el menú de compartir (para la compu). */
+  async function descargar() {
+    if (!habilitado) return;
+    setEstado("cargando");
+    try {
+      const blob = await (precargada.current ?? pedirImagen());
+      const limpio = nombreBase
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .trim();
+      const obj = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = obj;
+      a.download = `${limpio || "imagen"}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Se libera después: revocar enseguida puede cortar la descarga en algunos navegadores.
+      setTimeout(() => URL.revokeObjectURL(obj), 10_000);
+      setEstado("descargado");
+      setTimeout(() => setEstado("idle"), 2500);
+    } catch {
+      setEstado("error");
+      setTimeout(() => setEstado("idle"), 3000);
+    }
+  }
+
+  return { estado, compartir, descargar };
 }

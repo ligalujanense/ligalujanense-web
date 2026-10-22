@@ -6,7 +6,7 @@ import { useCompartirImagen, type OpcionesImagen } from "./useCompartirImagen";
 const CHIP =
   "px-2 py-1 rounded border border-neutral-300 hover:border-dorado hover:text-dorado-oscuro transition-colors";
 
-type Red = "WhatsApp" | "Instagram" | "Facebook" | "X";
+type Red = "WhatsApp" | "Instagram" | "Facebook" | "X" | "Descargar";
 
 /**
  * Botones para compartir.
@@ -38,7 +38,7 @@ export function ShareButtons({
   const url = `${origin}${path}`;
 
   // Una sola instancia: la imagen se baja una vez aunque haya varios botones.
-  const { estado, compartir } = useCompartirImagen(
+  const { estado, compartir, descargar } = useCompartirImagen(
     { endpoint: imagen?.endpoint ?? "", nombreBase: imagen?.nombreBase ?? "", ...imagen, titulo: title, url: path },
     !!imagen
   );
@@ -48,6 +48,7 @@ export function ShareButtons({
     if (estado === "cargando") return "Generando…";
     if (estado === "error") return "Error, reintentá";
     if (estado === "copiado") return "Link copiado";
+    if (estado === "descargado") return "Descargada";
     return red;
   };
 
@@ -89,6 +90,20 @@ export function ShareButtons({
               {l.label}
             </a>
           ))}
+      {imagen && (
+        <button
+          type="button"
+          disabled={estado === "cargando"}
+          onClick={() => {
+            setPulsado("Descargar");
+            descargar();
+          }}
+          title="Descargar la imagen (PNG)"
+          className={`${CHIP} disabled:opacity-60`}
+        >
+          {etiqueta("Descargar")}
+        </button>
+      )}
       <button
         type="button"
         onClick={async () => {
