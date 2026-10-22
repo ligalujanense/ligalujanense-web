@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { encontrarCategoria } from "@/lib/torneos";
 import { cargarCuadro } from "@/lib/fase-final-data";
 import { CuadroFaseFinal } from "@/components/site/CuadroFaseFinal";
+import { ShareButtons } from "@/components/site/ShareButtons";
 
 export const metadata = { title: "Fase final" };
 
@@ -31,6 +32,18 @@ export default async function FaseFinalPage({
         <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">
           Fase final {temporada}
         </h1>
+        {cruces.length > 0 && (
+          <div className="mt-3">
+            <ShareButtons
+              title={`Fase final ${temporada}`}
+              path={`/torneos/${cat.slug}/${temporada}/fase-final`}
+              imagen={{
+                endpoint: `/api/fase-final-imagen/${cat.slug}/${temporada}`,
+                nombreBase: `Fase final ${temporada}`,
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {cruces.length > 0 ? (
