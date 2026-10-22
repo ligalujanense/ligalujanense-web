@@ -156,3 +156,18 @@ export function marcadorLocalVisitante(p: PartidoCruce) {
     ? { local: p.goles_b, visitante: p.goles_a }
     : { local: p.goles_a, visitante: p.goles_b };
 }
+
+/** Quién es local y visitante en un partido del cruce, con su marcador y su rótulo. */
+export function infoPartido(c: CruceResuelto, p: PartidoCruce) {
+  // Local: en la ida y el partido único es el club A; en la vuelta, el B.
+  const aLocal = p.tipo !== "vuelta";
+  const lado = (club: ClubFF | null, etiqueta: string) => ({ club, nombre: club?.nombre ?? etiqueta });
+  const tramo = p.tipo === "ida" ? "Ida" : p.tipo === "vuelta" ? "Vuelta" : null;
+  return {
+    local: aLocal ? lado(c.a, c.etiquetaA) : lado(c.b, c.etiquetaB),
+    visita: aLocal ? lado(c.b, c.etiquetaB) : lado(c.a, c.etiquetaA),
+    marcador: marcadorLocalVisitante(p),
+    tramo,
+    ronda: RONDA_LABEL[c.ronda],
+  };
+}

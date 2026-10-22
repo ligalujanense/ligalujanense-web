@@ -1,4 +1,4 @@
-import { RONDA_LABEL, marcadorLocalVisitante, type CruceResuelto, type PartidoCruce } from "./fase-final";
+import { infoPartido, type CruceResuelto, type PartidoCruce } from "./fase-final";
 import type { TickerPartido } from "./match-ticker";
 
 type Item = { dia: string; p: PartidoCruce; c: CruceResuelto };
@@ -44,26 +44,21 @@ export function tickerFaseFinal(cruces: CruceResuelto[], hoy: string): TickerPar
     .flat()
     .filter((i) => cargado(i.p) || i.dia >= hoy)
     .map(({ p, c }) => {
-      const m = marcadorLocalVisitante(p);
-      // Local: en la ida es el club A; en la vuelta, el B.
-      const aLocal = p.tipo !== "vuelta";
-      const local = aLocal ? { club: c.a, etiqueta: c.etiquetaA } : { club: c.b, etiqueta: c.etiquetaB };
-      const visita = aLocal ? { club: c.b, etiqueta: c.etiquetaB } : { club: c.a, etiqueta: c.etiquetaA };
-      const tramo = p.tipo === "ida" ? " · Ida" : p.tipo === "vuelta" ? " · Vuelta" : "";
+      const i = infoPartido(c, p);
       return {
         id: `ff-${p.id}`,
         zona: "",
         numeroFecha: 0,
-        etiqueta: `${RONDA_LABEL[c.ronda]}${tramo}`,
-        href: `/torneos/${c.categoria}/${c.temporada}/fase-final`,
+        etiqueta: i.tramo ? `${i.ronda} · ${i.tramo}` : i.ronda,
+        href: `/fase-final/partido/${p.id}`,
         fechaFecha: p.fecha,
-        local: local.club?.nombre ?? local.etiqueta,
-        logoLocal: local.club?.logo_url ?? null,
-        visitante: visita.club?.nombre ?? visita.etiqueta,
-        logoVisitante: visita.club?.logo_url ?? null,
-        estado: m ? "jugado" : "pendiente",
-        resultado_local: m?.local ?? null,
-        resultado_visitante: m?.visitante ?? null,
+        local: i.local.nombre,
+        logoLocal: i.local.club?.logo_url ?? null,
+        visitante: i.visita.nombre,
+        logoVisitante: i.visita.club?.logo_url ?? null,
+        estado: i.marcador ? "jugado" : "pendiente",
+        resultado_local: i.marcador?.local ?? null,
+        resultado_visitante: i.marcador?.visitante ?? null,
         hora: p.hora,
       } satisfies TickerPartido;
     });
