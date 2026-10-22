@@ -31,10 +31,6 @@ export default async function FaseFinalPage({
         <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-celeste-oscuro">
           Fase final {temporada}
         </h1>
-        <p className="text-sm text-neutral-500">
-          Cruces de ida y vuelta. Pasa de ronda quien tenga mejor global; si hay empate, se define
-          por penales.
-        </p>
       </div>
 
       {cruces.length > 0 ? (

@@ -32,10 +32,7 @@ export default async function TorneoTemporadaPage({
       </div>
 
       <div className="bg-white border border-dorado/40 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <p className="font-bold text-celeste-oscuro">Fase final</p>
-          <p className="text-xs text-neutral-500">Cuadro de cruces eliminatorios</p>
-        </div>
+        <p className="font-bold text-celeste-oscuro">Fase final</p>
         <Link
           href={`/torneos/${cat.slug}/${temporada}/fase-final`}
           className="bg-dorado hover:bg-dorado-oscuro text-white text-sm font-semibold rounded-full px-4 py-2 transition-colors"

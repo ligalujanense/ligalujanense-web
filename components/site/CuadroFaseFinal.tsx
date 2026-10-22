@@ -154,15 +154,10 @@ export function CuadroFaseFinal({ cruces }: { cruces: CruceResuelto[] }) {
       {finalAnual && (
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-bold uppercase tracking-wider text-dorado-oscuro">
-            Final Anual · el ganador asciende
+            Final Anual
           </h2>
-          <div className="flex flex-wrap items-center gap-4">
-            <div style={{ width: ANCHO }}>
-              <TarjetaCruce c={finalAnual} />
-            </div>
-            <p className="max-w-xs text-xs text-neutral-500">
-              El perdedor sigue en la 2ª Fase y juega contra el ganador del cruce 4.
-            </p>
+          <div style={{ width: ANCHO }}>
+            <TarjetaCruce c={finalAnual} />
           </div>
         </section>
       )}
@@ -176,7 +171,7 @@ export function CuadroFaseFinal({ cruces }: { cruces: CruceResuelto[] }) {
             <span />
             <span>Semifinal</span>
             <span />
-            <span>Final · asciende</span>
+            <span>Final</span>
           </div>
 
           <div
