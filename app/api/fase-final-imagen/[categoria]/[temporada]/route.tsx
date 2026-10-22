@@ -5,7 +5,6 @@ import { BloqueSponsors } from "@/lib/og-sponsors";
 import { imagenConCache } from "@/lib/og-cache";
 import { encontrarCategoria } from "@/lib/torneos";
 import { cargarCuadro } from "@/lib/fase-final-data";
-import { clubCorto } from "@/lib/club-corto";
 import type { ClubFF, CruceResuelto } from "@/lib/fase-final";
 
 export const maxDuration = 30;
@@ -18,12 +17,12 @@ const DORADO = "#B5842E";
 const W = 1080;
 const H = 1920;
 const CX = 540;
-const CY = 905;
-const KY = 1.3; // el círculo se estira a lo alto para aprovechar el lienzo vertical
-const R_OUT = 360; // clubes del borde
-const R_L2 = 272; // ganadores de la 1ª fase (y Perdedor Final Anual)
-const R_L1 = 195; // ganadores de la 2ª fase
-const R_L0 = 122; // ganadores de semifinal
+const CY = 885;
+const KY = 1; // 1 = círculo perfecto
+const R_OUT = 420; // clubes del borde
+const R_L2 = 318; // ganadores de la 1ª fase (y Perdedor Final Anual)
+const R_L1 = 228; // ganadores de la 2ª fase
+const R_L0 = 142; // ganadores de semifinal
 const DELTA = 9; // separación angular de los dos clubes de un cruce
 
 const rad = (g: number) => (g * Math.PI) / 180;
@@ -39,7 +38,6 @@ type Nodo = {
   size: number;
   club: ClubFF | null;
   dim: boolean;
-  etiqueta: boolean;
   /** id del nodo hacia el que va la línea (null = centro). */
   padre: string | null;
   /** Línea resaltada: este club avanza. */
@@ -119,8 +117,8 @@ function armarNodos(cruces: CruceResuelto[]): Nodo[] {
       const club = (l.lado === "a" ? cPadre?.a : cPadre?.b) ?? null;
       if (!club) return;
       nodos.push({
-        id, r: R_OUT, ang, size: 76, club,
-        dim: perdio(club, padre), etiqueta: true, padre: `f2-${padre}`, activo: true,
+        id, r: R_OUT, ang, size: 88, club,
+        dim: perdio(club, padre), padre: `f2-${padre}`, activo: true,
       });
       return;
     }
@@ -129,15 +127,15 @@ function armarNodos(cruces: CruceResuelto[]): Nodo[] {
       const fa = por.get("FA");
       const club = fa?.perdedor ?? null;
       nodos.push({
-        id, r: R_L2, ang, size: 66, club,
-        dim: perdio(club, padre), etiqueta: false, padre: `f2-${padre}`, activo: !!club,
+        id, r: R_L2, ang, size: 80, club,
+        dim: perdio(club, padre), padre: `f2-${padre}`, activo: !!club,
       });
       if (fa) {
         [fa.a, fa.b].forEach((k, i) => {
           if (!k) return;
           nodos.push({
-            id: `${id}-${i}`, r: R_OUT, ang: ang + (i === 0 ? -DELTA : DELTA), size: 76, club: k,
-            dim: false, etiqueta: true, padre: id, activo: fa.perdedor?.id === k.id,
+            id: `${id}-${i}`, r: R_OUT, ang: ang + (i === 0 ? -DELTA : DELTA), size: 88, club: k,
+            dim: false, padre: id, activo: fa.perdedor?.id === k.id,
           });
         });
       }
@@ -148,15 +146,15 @@ function armarNodos(cruces: CruceResuelto[]): Nodo[] {
     const c = por.get(l.cruce);
     const club = c?.ganador ?? null;
     nodos.push({
-      id, r: R_L2, ang, size: 66, club,
-      dim: perdio(club, padre), etiqueta: false, padre: `f2-${padre}`, activo: !!club,
+      id, r: R_L2, ang, size: 80, club,
+      dim: perdio(club, padre), padre: `f2-${padre}`, activo: !!club,
     });
     if (c) {
       [c.a, c.b].forEach((k, i) => {
         if (!k) return;
         nodos.push({
-          id: `${id}-${i}`, r: R_OUT, ang: ang + (i === 0 ? -DELTA : DELTA), size: 76, club: k,
-          dim: perdio(k, c.codigo), etiqueta: true, padre: id, activo: c.ganador?.id === k.id,
+          id: `${id}-${i}`, r: R_OUT, ang: ang + (i === 0 ? -DELTA : DELTA), size: 88, club: k,
+          dim: perdio(k, c.codigo), padre: id, activo: c.ganador?.id === k.id,
         });
       });
     }
@@ -173,8 +171,8 @@ function armarNodos(cruces: CruceResuelto[]): Nodo[] {
   for (const [cod, ang, semi] of f2) {
     const club = por.get(cod)?.ganador ?? null;
     nodos.push({
-      id: `f2-${cod}`, r: R_L1, ang, size: 62, club,
-      dim: perdio(club, semi), etiqueta: false, padre: `sf-${semi}`, activo: !!club,
+      id: `f2-${cod}`, r: R_L1, ang, size: 74, club,
+      dim: perdio(club, semi), padre: `sf-${semi}`, activo: !!club,
     });
   }
   const angX = ang2(f2[0][1], f2[1][1]);
@@ -182,8 +180,8 @@ function armarNodos(cruces: CruceResuelto[]): Nodo[] {
   for (const [cod, ang] of [["X", angX], ["Y", angY]] as [string, number][]) {
     const club = por.get(cod)?.ganador ?? null;
     nodos.push({
-      id: `sf-${cod}`, r: R_L0, ang, size: 58, club,
-      dim: perdio(club, "F"), etiqueta: false, padre: null, activo: !!club,
+      id: `sf-${cod}`, r: R_L0, ang, size: 68, club,
+      dim: perdio(club, "F"), padre: null, activo: !!club,
     });
   }
   return nodos;
@@ -244,8 +242,8 @@ export async function GET(
                 position: "absolute",
                 left: 48,
                 right: 48,
-                top: 300,
-                height: 1190,
+                top: 340,
+                height: 1090,
                 background: "#ffffff",
                 borderRadius: 36,
               }}
@@ -301,12 +299,6 @@ export async function GET(
             {/* Escudos y puntos vacíos */}
             {nodos.map((n) => {
               const [x, y] = pol(n.r, n.ang);
-              // Centro de la etiqueta: pegada al escudo, corrida hacia afuera según el ángulo
-              // (a los costados hace falta más corrimiento horizontal, arriba/abajo más vertical).
-              const c = Math.cos(rad(n.ang));
-              const sn = Math.sin(rad(n.ang));
-              const lx = x + c * (n.size / 2 + 8 + 60 * Math.abs(c)) + c * 0;
-              const ly = y + sn * (n.size / 2 + 6 + 24 * Math.abs(sn));
               return (
                 <div key={n.id} style={{ display: "flex" }}>
                   <div
@@ -336,26 +328,6 @@ export async function GET(
                       />
                     )}
                   </div>
-                  {n.etiqueta && n.club && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: lx - 60,
-                        top: ly - 24,
-                        width: 120,
-                        height: 48,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        opacity: n.dim ? 0.4 : 1,
-                      }}
-                    >
-                      <span style={{ fontSize: 20, fontWeight: 700, color: "#374151", lineHeight: 1.1 }}>
-                        {clubCorto(n.club.nombre)}
-                      </span>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -364,20 +336,20 @@ export async function GET(
             <div
               style={{
                 position: "absolute",
-                left: CX - 70,
-                top: CY - 70,
-                width: 140,
-                height: 140,
+                left: CX - 80,
+                top: CY - 80,
+                width: 160,
+                height: 160,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
               {campeon ? (
-                <Escudo club={campeon} size={140} />
+                <Escudo club={campeon} size={160} />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={LIGA_LOGO} width={110} height={121} style={{ objectFit: "contain" }} alt="" />
+                <img src={LIGA_LOGO} width={120} height={132} style={{ objectFit: "contain" }} alt="" />
               )}
             </div>
 
