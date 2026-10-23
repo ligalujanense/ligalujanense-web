@@ -13,6 +13,8 @@ export function NuevaNoticiaForm() {
   const [imagenUploading, setImagenUploading] = useState(false);
   const [focoX, setFocoX] = useState(50);
   const [focoY, setFocoY] = useState(50);
+  const [webX, setWebX] = useState(50);
+  const [webY, setWebY] = useState(50);
 
   return (
     <form
@@ -48,6 +50,19 @@ export function NuevaNoticiaForm() {
         onChange={(x, y) => {
           setFocoX(x);
           setFocoY(y);
+        }}
+      />
+      <EncuadreHistoria
+        titulo="Encuadre en el inicio y la lista (carrusel y tarjetas)"
+        proporcion={2.4}
+        nombreX="web_foco_x"
+        nombreY="web_foco_y"
+        imagenUrl={imagenUrl}
+        x={webX}
+        y={webY}
+        onChange={(x, y) => {
+          setWebX(x);
+          setWebY(y);
         }}
       />
       <label className="flex items-center gap-2 text-sm">

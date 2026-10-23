@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { posicionFoto } from "@/lib/foco";
 
 type Noticia = {
   id: string;
@@ -9,6 +10,8 @@ type Noticia = {
   slug: string;
   resumen: string | null;
   imagen_url: string | null;
+  web_foco_x?: number | null;
+  web_foco_y?: number | null;
 };
 
 export function HeroCarousel({ noticias }: { noticias: Noticia[] }) {
@@ -41,6 +44,7 @@ export function HeroCarousel({ noticias }: { noticias: Noticia[] }) {
               src={noticia.imagen_url}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: posicionFoto(noticia.web_foco_x, noticia.web_foco_y) }}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-dorado-oscuro via-dorado to-celeste-oscuro" />

@@ -5,7 +5,7 @@ export default async function NoticiasAdminPage() {
   const supabase = createAdminClient();
   const { data: noticias } = await supabase
     .from("noticias")
-    .select("id, titulo, resumen, contenido, imagen_url, foco_x, foco_y, publicado, created_at")
+    .select("id, titulo, resumen, contenido, imagen_url, foco_x, foco_y, web_foco_x, web_foco_y, publicado, created_at")
     .order("created_at", { ascending: false });
 
   return (

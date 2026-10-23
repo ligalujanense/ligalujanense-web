@@ -14,6 +14,8 @@ type Noticia = {
   imagen_url: string | null;
   foco_x: number | null;
   foco_y: number | null;
+  web_foco_x: number | null;
+  web_foco_y: number | null;
   publicado: boolean;
   created_at: string;
 };
@@ -129,6 +131,8 @@ function NoticiaEditForm({
   const [imagenUploading, setImagenUploading] = useState(false);
   const [focoX, setFocoX] = useState(noticia.foco_x ?? 50);
   const [focoY, setFocoY] = useState(noticia.foco_y ?? 50);
+  const [webX, setWebX] = useState(noticia.web_foco_x ?? 50);
+  const [webY, setWebY] = useState(noticia.web_foco_y ?? 50);
 
   return (
     <form
@@ -183,6 +187,19 @@ function NoticiaEditForm({
         onChange={(x, y) => {
           setFocoX(x);
           setFocoY(y);
+        }}
+      />
+      <EncuadreHistoria
+        titulo="Encuadre en el inicio y la lista (carrusel y tarjetas)"
+        proporcion={2.4}
+        nombreX="web_foco_x"
+        nombreY="web_foco_y"
+        imagenUrl={imagenUrl}
+        x={webX}
+        y={webY}
+        onChange={(x, y) => {
+          setWebX(x);
+          setWebY(y);
         }}
       />
       <div className="flex gap-2">

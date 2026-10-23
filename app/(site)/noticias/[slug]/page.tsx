@@ -85,7 +85,7 @@ export default async function NoticiaDetallePage({
         <img
           src={noticia.imagen_url}
           alt={noticia.titulo}
-          className="rounded-xl w-full object-cover max-h-96"
+          className="mx-auto h-auto w-auto max-w-full max-h-[80vh] rounded-xl"
         />
       ) : (
         <div className="h-48 rounded-xl bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">

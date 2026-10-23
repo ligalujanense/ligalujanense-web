@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { posicionFoto } from "@/lib/foco";
 
 export default async function NoticiasPage() {
   const supabase = await createClient();
   const { data: noticias } = await supabase
     .from("noticias")
-    .select("id, titulo, slug, resumen, created_at, imagen_url")
+    .select("id, titulo, slug, resumen, created_at, imagen_url, web_foco_x, web_foco_y")
     .eq("publicado", true)
     .order("created_at", { ascending: false });
 
@@ -28,7 +29,12 @@ export default async function NoticiasPage() {
             >
               {noticia.imagen_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={noticia.imagen_url} alt={noticia.titulo} className="h-40 w-full object-cover" />
+                <img
+                  src={noticia.imagen_url}
+                  alt={noticia.titulo}
+                  className="h-40 w-full object-cover"
+                  style={{ objectPosition: posicionFoto(noticia.web_foco_x, noticia.web_foco_y) }}
+                />
               ) : (
                 <div className="h-32 bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">
                   <span className="text-white font-black text-xs uppercase tracking-widest">

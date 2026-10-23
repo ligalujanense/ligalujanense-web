@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Elige qué parte de la foto se ve en la imagen para compartir (formato historia
@@ -15,20 +15,38 @@ export function EncuadreHistoria({
   x,
   y,
   onChange,
+  titulo = "Encuadre para compartir (historias, WhatsApp)",
+  proporcion = 9 / 16,
+  nombreX = "foco_x",
+  nombreY = "foco_y",
 }: {
   imagenUrl: string;
   x: number;
   y: number;
   onChange: (x: number, y: number) => void;
+  /** Título del bloque. */
+  titulo?: string;
+  /** Proporción ancho/alto del recuadro (9/16 = historia; ~2.4 = franja del inicio). */
+  proporcion?: number;
+  /** Nombres de los campos ocultos que se guardan con el formulario. */
+  nombreX?: string;
+  nombreY?: string;
 }) {
   const [medidas, setMedidas] = useState<{ w: number; h: number } | null>(null);
   const caja = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const arrastrando = useRef<{ px: number; py: number; x: number; y: number } | null>(null);
+
+  // Si la imagen ya estaba cargada (caché) cuando se montó, onLoad no se dispara: se lee acá.
+  useEffect(() => {
+    const i = imgRef.current;
+    if (i && i.complete && i.naturalWidth) setMedidas({ w: i.naturalWidth, h: i.naturalHeight });
+  }, [imagenUrl]);
 
   if (!imagenUrl) return null;
 
-  // Fracción de la foto que entra en 9:16 (misma cuenta que el generador de la imagen).
-  const objetivo = 9 / 16;
+  // Fracción de la foto que entra en el recuadro (misma cuenta que el generador de la imagen).
+  const objetivo = proporcion;
   const aspecto = medidas ? medidas.w / medidas.h : 16 / 9;
   const vw = aspecto > objetivo ? Math.min(1, objetivo / aspecto) : 1;
   const vh = aspecto > objetivo ? 1 : Math.min(1, aspecto / objetivo);
@@ -59,7 +77,7 @@ export function EncuadreHistoria({
 
   return (
     <div className="flex flex-col gap-2 text-sm">
-      <span>Encuadre para compartir (historias, WhatsApp)</span>
+      <span>{titulo}</span>
       <p className="text-xs text-neutral-500">
         Lo que queda adentro de las líneas es lo que se va a mostrar. Arrastrá el recuadro sobre
         la foto o usá los deslizadores.
@@ -72,6 +90,7 @@ export function EncuadreHistoria({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          ref={imgRef}
           src={imagenUrl}
           alt=""
           draggable={false}
@@ -140,8 +159,8 @@ export function EncuadreHistoria({
           Centrar
         </button>
       </div>
-      <input type="hidden" name="foco_x" value={x} />
-      <input type="hidden" name="foco_y" value={y} />
+      <input type="hidden" name={nombreX} value={x} />
+      <input type="hidden" name={nombreY} value={y} />
     </div>
   );
 }

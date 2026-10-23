@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { MatchTicker } from "@/components/site/MatchTicker";
+import { posicionFoto } from "@/lib/foco";
 import { elegirFechaActiva, hoyArgentina, soloVigentes, type TickerPartido } from "@/lib/match-ticker";
 import { cargarCuadro } from "@/lib/fase-final-data";
 import { tickerFaseFinal } from "@/lib/fase-final-ticker";
@@ -14,7 +15,7 @@ export default async function Home() {
     await Promise.all([
       supabase
         .from("noticias")
-        .select("id, titulo, slug, resumen, imagen_url, created_at")
+        .select("id, titulo, slug, resumen, imagen_url, web_foco_x, web_foco_y, created_at")
         .eq("publicado", true)
         .order("created_at", { ascending: false })
         .limit(5),
@@ -132,7 +133,12 @@ export default async function Home() {
                 >
                   {noticia.imagen_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={noticia.imagen_url} alt="" className="h-32 w-full object-cover" />
+                    <img
+                      src={noticia.imagen_url}
+                      alt=""
+                      className="h-32 w-full object-cover"
+                      style={{ objectPosition: posicionFoto(noticia.web_foco_x, noticia.web_foco_y) }}
+                    />
                   ) : (
                     <div className="h-32 bg-gradient-to-br from-dorado-oscuro to-dorado flex items-center justify-center">
                       <span className="text-white font-black text-xs uppercase tracking-widest">

@@ -37,6 +37,8 @@ export async function crearNoticia(formData: FormData) {
     imagen_url: imagen_url || null,
     foco_x: foco(formData.get("foco_x")),
     foco_y: foco(formData.get("foco_y")),
+    web_foco_x: foco(formData.get("web_foco_x")),
+    web_foco_y: foco(formData.get("web_foco_y")),
     publicado,
   });
   if (error) return { error: error.message };
@@ -65,6 +67,8 @@ export async function actualizarNoticia(id: string, formData: FormData) {
       imagen_url: imagen_url || null,
       foco_x: foco(formData.get("foco_x")),
       foco_y: foco(formData.get("foco_y")),
+      web_foco_x: foco(formData.get("web_foco_x")),
+      web_foco_y: foco(formData.get("web_foco_y")),
     })
     .eq("id", id);
   if (error) return { error: error.message };
