@@ -143,21 +143,6 @@ export function rankear<T extends { jugador: string; goles: number }>(
   return ordenadas.map((f, i) => ({ ...f, puesto: i + 1, lider: f.goles === maximo && maximo > 0 }));
 }
 
-/**
- * Cuántas filas mostrar arriba: las primeras `top`, completando el grupo que empata en goles
- * con la última (para no dejar afuera a alguien con los mismos goles), sin pasar de `max`.
- */
-export function cantidadTop(filas: { goles: number }[], top = 10, max = 18): number {
-  if (filas.length <= top) return filas.length;
-  let n = top;
-  while (n < filas.length && filas[n].goles === filas[top - 1].goles) n++;
-  if (n <= max) return n;
-  // El grupo es demasiado grande: se corta justo antes de que empiece.
-  let m = top;
-  while (m > 0 && filas[m - 1].goles === filas[top - 1].goles) m--;
-  return m > 0 ? m : top;
-}
-
 type FilaDb = {
   jugador: string;
   club_id: string | null;

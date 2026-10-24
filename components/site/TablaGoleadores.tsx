@@ -1,4 +1,4 @@
-import { cantidadTop, formatearNombre } from "@/lib/goleadores";
+import { formatearNombre } from "@/lib/goleadores";
 
 export type FilaTabla = {
   puesto: number;
@@ -68,8 +68,7 @@ function Fila({ f, desglose }: { f: FilaTabla; desglose: boolean }) {
 }
 
 /**
- * Tabla de goleadores. Muestra los primeros `top` (completando los que empatan en goles con
- * el último) y el resto queda en "Ver todos".
+ * Tabla de goleadores. Muestra exactamente los primeros `top` y el resto queda en "Ver todos".
  */
 export function TablaGoleadores({
   filas,
@@ -80,9 +79,8 @@ export function TablaGoleadores({
   top?: number;
   desglose?: boolean;
 }) {
-  const corte = cantidadTop(filas, top, 20);
-  const principales = filas.slice(0, corte);
-  const resto = filas.slice(corte);
+  const principales = filas.slice(0, top);
+  const resto = filas.slice(top);
 
   return (
     <div className="flex flex-col gap-3">

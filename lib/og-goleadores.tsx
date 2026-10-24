@@ -1,6 +1,6 @@
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
-import { cantidadTop, formatearNombre } from "@/lib/goleadores";
+import { formatearNombre } from "@/lib/goleadores";
 import type { FilaTabla } from "@/components/site/TablaGoleadores";
 
 const CREMA = "#F7F5F0";
@@ -8,9 +8,9 @@ const CELESTE = "#0E7FAE";
 const DORADO = "#B5842E";
 const GRIS = "#737373";
 
-/** Filas que entran en la imagen: las primeras 10, completando empates, máximo 18. */
+/** Filas que entran en la imagen: solo el top 10. */
 export function filasParaImagen(filas: FilaTabla[]): FilaTabla[] {
-  return filas.slice(0, cantidadTop(filas, 10, 18));
+  return filas.slice(0, 10);
 }
 
 function Escudo({ clubId, nombre, size }: { clubId?: string | null; nombre: string; size: number }) {
