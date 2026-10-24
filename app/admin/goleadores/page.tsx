@@ -38,14 +38,14 @@ export default async function GoleadoresAdminPage({
   q = actual.id === "fase-final" ? q.is("zona_id", null) : q.eq("zona_id", actual.id);
   const { data: filas } = await q;
 
-  const ranking = rankear(filas ?? []);
+  const ranking = rankear(filas ?? [], (f) => f.club_nombre);
 
   return (
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-2xl font-bold">Goleadores</h1>
         <p className="text-sm text-neutral-500">
-          Total de goles por jugador. El goleador anual suma las dos zonas y la fase final.
+          Total de goles por jugador. La tabla general de Torneos suma las dos zonas y la fase final.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">

@@ -42,7 +42,7 @@ export default async function TorneoTemporadaPage({
       </div>
 
       <div className="bg-white border border-neutral-200 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
-        <p className="font-bold text-celeste-oscuro">Goleador anual</p>
+        <p className="font-bold text-celeste-oscuro">Goleadores</p>
         <Link
           href={`/torneos/${cat.slug}/${temporada}/goleadores`}
           className="bg-celeste-oscuro hover:bg-celeste text-white text-sm font-semibold rounded-full px-4 py-2 transition-colors"

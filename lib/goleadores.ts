@@ -114,6 +114,7 @@ export function formatearNombre(nombre: string): string {
 
 export type FilaRanking = {
   puesto: number;
+  lider?: boolean;
   jugador: string;
   club: string;
   clubId: string | null;
@@ -123,22 +124,38 @@ export type FilaRanking = {
   faseFinal?: number;
 };
 
-/** Ordena por goles (y apellido) y numera con empates: 1, 1, 3, 4… */
+/**
+ * Ordena por goles; los que empatan en goles van por orden alfabético del club (y después
+ * del jugador). La numeración es corrida: 1, 2, 3, 4… (sin repetir ni saltear números).
+ * `lider` marca a todos los que tienen la mayor cantidad de goles.
+ */
 export function rankear<T extends { jugador: string; goles: number }>(
-  filas: T[]
-): (T & { puesto: number })[] {
+  filas: T[],
+  clubDe: (f: T) => string = () => ""
+): (T & { puesto: number; lider: boolean })[] {
   const ordenadas = [...filas].sort(
-    (a, b) => b.goles - a.goles || normalizar(a.jugador).localeCompare(normalizar(b.jugador))
+    (a, b) =>
+      b.goles - a.goles ||
+      normalizar(clubDe(a)).localeCompare(normalizar(clubDe(b))) ||
+      normalizar(a.jugador).localeCompare(normalizar(b.jugador))
   );
-  let puesto = 0;
-  let anterior = -1;
-  return ordenadas.map((f, i) => {
-    if (f.goles !== anterior) {
-      puesto = i + 1;
-      anterior = f.goles;
-    }
-    return { ...f, puesto };
-  });
+  const maximo = ordenadas[0]?.goles ?? 0;
+  return ordenadas.map((f, i) => ({ ...f, puesto: i + 1, lider: f.goles === maximo && maximo > 0 }));
+}
+
+/**
+ * Cuántas filas mostrar arriba: las primeras `top`, completando el grupo que empata en goles
+ * con la última (para no dejar afuera a alguien con los mismos goles), sin pasar de `max`.
+ */
+export function cantidadTop(filas: { goles: number }[], top = 10, max = 18): number {
+  if (filas.length <= top) return filas.length;
+  let n = top;
+  while (n < filas.length && filas[n].goles === filas[top - 1].goles) n++;
+  if (n <= max) return n;
+  // El grupo es demasiado grande: se corta justo antes de que empiece.
+  let m = top;
+  while (m > 0 && filas[m - 1].goles === filas[top - 1].goles) m--;
+  return m > 0 ? m : top;
 }
 
 type FilaDb = {
@@ -178,5 +195,5 @@ export function goleadorAnual(
       });
     }
   }
-  return rankear([...mapa.values()]);
+  return rankear([...mapa.values()], (f) => f.club);
 }

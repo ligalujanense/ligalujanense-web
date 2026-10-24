@@ -1,7 +1,9 @@
-import { formatearNombre } from "@/lib/goleadores";
+import { cantidadTop, formatearNombre } from "@/lib/goleadores";
 
 export type FilaTabla = {
   puesto: number;
+  /** Tiene la mayor cantidad de goles (se resalta). */
+  lider?: boolean;
   jugador: string;
   club: string;
   logo: string | null;
@@ -28,7 +30,7 @@ function Encabezado({ desglose }: { desglose: boolean }) {
 }
 
 function Fila({ f, desglose }: { f: FilaTabla; desglose: boolean }) {
-  const lider = f.puesto === 1;
+  const lider = !!f.lider;
   return (
     <tr
       className={`border-b border-neutral-100 last:border-0 ${
@@ -66,20 +68,21 @@ function Fila({ f, desglose }: { f: FilaTabla; desglose: boolean }) {
 }
 
 /**
- * Tabla de goleadores. Muestra hasta el puesto `hastaPuesto` (los empatados en ese puesto
- * entran todos) y el resto queda en "Ver todos".
+ * Tabla de goleadores. Muestra los primeros `top` (completando los que empatan en goles con
+ * el último) y el resto queda en "Ver todos".
  */
 export function TablaGoleadores({
   filas,
-  hastaPuesto = 10,
+  top = 10,
   desglose = false,
 }: {
   filas: FilaTabla[];
-  hastaPuesto?: number;
+  top?: number;
   desglose?: boolean;
 }) {
-  const principales = filas.filter((f) => f.puesto <= hastaPuesto);
-  const resto = filas.filter((f) => f.puesto > hastaPuesto);
+  const corte = cantidadTop(filas, top, 20);
+  const principales = filas.slice(0, corte);
+  const resto = filas.slice(corte);
 
   return (
     <div className="flex flex-col gap-3">

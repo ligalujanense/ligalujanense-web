@@ -1,6 +1,6 @@
 import { LIGA_LOGO, CLUB_LOGOS } from "@/lib/baked-assets.generated";
 import { BloqueSponsors } from "@/lib/og-sponsors";
-import { formatearNombre } from "@/lib/goleadores";
+import { cantidadTop, formatearNombre } from "@/lib/goleadores";
 import type { FilaTabla } from "@/components/site/TablaGoleadores";
 
 const CREMA = "#F7F5F0";
@@ -8,22 +8,9 @@ const CELESTE = "#0E7FAE";
 const DORADO = "#B5842E";
 const GRIS = "#737373";
 
-/**
- * Filas que entran en la imagen: hasta el puesto 10, máximo 18 filas. Los empates se
- * muestran completos o no se muestran: nunca se corta un grupo de empatados a la mitad.
- */
+/** Filas que entran en la imagen: las primeras 10, completando empates, máximo 18. */
 export function filasParaImagen(filas: FilaTabla[]): FilaTabla[] {
-  const grupos = new Map<number, FilaTabla[]>();
-  for (const f of filas) {
-    if (f.puesto > 10) break;
-    grupos.set(f.puesto, [...(grupos.get(f.puesto) ?? []), f]);
-  }
-  const salida: FilaTabla[] = [];
-  for (const g of grupos.values()) {
-    if (salida.length > 0 && salida.length + g.length > 18) break;
-    salida.push(...g);
-  }
-  return salida;
+  return filas.slice(0, cantidadTop(filas, 10, 18));
 }
 
 function Escudo({ clubId, nombre, size }: { clubId?: string | null; nombre: string; size: number }) {
@@ -134,7 +121,7 @@ export function ImagenGoleadores({
               alignItems: "center",
               height: rowH,
               borderTop: i === 0 ? "0px solid #eee" : "1px solid #eeeeee",
-              background: f.puesto === 1 ? "#FBF4E3" : "#ffffff",
+              background: f.lider ? "#FBF4E3" : "#ffffff",
               padding: "0 8px",
             }}
           >
@@ -143,7 +130,7 @@ export function ImagenGoleadores({
                 style={{
                   fontSize: tNombre,
                   fontWeight: 800,
-                  color: f.puesto === 1 ? DORADO : GRIS,
+                  color: f.lider ? DORADO : GRIS,
                 }}
               >
                 {f.puesto}

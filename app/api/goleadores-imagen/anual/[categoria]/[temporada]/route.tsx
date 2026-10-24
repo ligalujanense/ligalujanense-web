@@ -30,9 +30,8 @@ export async function GET(
       new ImageResponse(
         (
           <ImagenGoleadores
-            kicker="Goleador anual"
-            titulo={temporada}
-            subtitulo="Zonas y fase final"
+            kicker={`Temporada ${temporada}`}
+            titulo="Goleadores"
             filas={filas}
           />
         ),

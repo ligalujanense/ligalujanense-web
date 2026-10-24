@@ -22,10 +22,13 @@ export async function goleadoresDeZona(supabase: SupabaseClient, zonaId: string)
     .select("jugador, club_id, club_nombre, goles, zona_id")
     .eq("zona_id", zonaId);
   const clubes = await clubesPorId(supabase);
-  return rankear((data ?? []) as FilaDb[]).map((f) => {
+  const nombreClub = (f: FilaDb) =>
+    (f.club_id ? clubes.get(f.club_id)?.nombre : undefined) ?? formatearNombre(f.club_nombre);
+  return rankear((data ?? []) as FilaDb[], nombreClub).map((f) => {
     const club = f.club_id ? clubes.get(f.club_id) : undefined;
     return {
       puesto: f.puesto,
+      lider: f.lider,
       jugador: f.jugador,
       club: club?.nombre ?? formatearNombre(f.club_nombre),
       logo: club?.logo_url ?? null,
@@ -56,6 +59,7 @@ export async function goleadorAnualDeTemporada(
     hayFaseFinal: rows.some((r) => r.zona_id === null && r.goles > 0),
     filas: ranking.map((f) => ({
       puesto: f.puesto,
+      lider: f.lider,
       jugador: f.jugador,
       club: f.club,
       logo: f.clubId ? (clubes.get(f.clubId)?.logo_url ?? null) : null,
