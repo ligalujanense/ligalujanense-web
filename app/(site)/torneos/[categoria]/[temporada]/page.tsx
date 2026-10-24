@@ -41,6 +41,16 @@ export default async function TorneoTemporadaPage({
         </Link>
       </div>
 
+      <div className="bg-white border border-neutral-200 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+        <p className="font-bold text-celeste-oscuro">Goleador anual</p>
+        <Link
+          href={`/torneos/${cat.slug}/${temporada}/goleadores`}
+          className="bg-celeste-oscuro hover:bg-celeste text-white text-sm font-semibold rounded-full px-4 py-2 transition-colors"
+        >
+          Ver goleadores
+        </Link>
+      </div>
+
       {zonas && zonas.length > 0 ? (
         <div className="flex flex-col gap-3">
           {zonas.map((zona) => (

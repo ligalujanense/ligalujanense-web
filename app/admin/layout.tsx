@@ -7,6 +7,7 @@ const linksAdminGeneral = [
   { href: "/admin/clubes", label: "Clubes" },
   { href: "/admin/fixture", label: "Fixture" },
   { href: "/admin/fase-final", label: "Fase final" },
+  { href: "/admin/goleadores", label: "Goleadores" },
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/noticias", label: "Noticias" },
   { href: "/admin/sponsors", label: "Sponsors" },
