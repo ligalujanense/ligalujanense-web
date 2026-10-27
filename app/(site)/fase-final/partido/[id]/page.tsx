@@ -48,6 +48,21 @@ export default async function PartidoFaseFinalPage({
             <span className="text-[11px] uppercase tracking-wide text-neutral-400 font-bold">
               {i.marcador ? "Final" : "Programado"}
             </span>
+            {i.global && (
+              <div className="mt-2 flex flex-col items-center">
+                <span className="text-[11px] uppercase tracking-widest text-neutral-400 font-bold">
+                  Global
+                </span>
+                <span className="text-xl sm:text-2xl font-extrabold text-dorado-oscuro">
+                  {i.global.local} - {i.global.visita}
+                </span>
+                {i.global.penales && (
+                  <span className="text-xs font-semibold text-neutral-500">
+                    Penales {i.global.penales.local} - {i.global.penales.visita}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           <EquipoBloque nombre={i.visita.nombre} logoUrl={i.visita.club?.logo_url ?? null} />

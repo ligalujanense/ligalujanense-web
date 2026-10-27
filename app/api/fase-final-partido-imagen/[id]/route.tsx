@@ -80,6 +80,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       hora: partido.hora,
       estadio: partido.estadio,
       marcador: i.marcador,
+      global: i.global,
     },
     cacheControl: "public, max-age=0, s-maxage=30, must-revalidate",
     dibujar: () =>
@@ -176,6 +177,28 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
                   <span style={{ fontSize: 17, fontWeight: 700, color: "#9ca3af" }}>
                     {i.marcador ? "FINAL" : "PROGRAMADO"}
                   </span>
+                  {i.global && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginTop: 40,
+                      }}
+                    >
+                      <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: 4, color: "#9ca3af" }}>
+                        GLOBAL
+                      </span>
+                      <span style={{ fontSize: 64, fontWeight: 800, color: DORADO, lineHeight: 1.1 }}>
+                        {i.global.local} - {i.global.visita}
+                      </span>
+                      {i.global.penales && (
+                        <span style={{ fontSize: 26, fontWeight: 700, color: "#6b7280", marginTop: 6 }}>
+                          Penales {i.global.penales.local} - {i.global.penales.visita}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <Equipo nombre={i.visita.nombre} club={i.visita.club} />
               </div>

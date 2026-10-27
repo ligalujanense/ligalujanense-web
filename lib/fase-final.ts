@@ -171,5 +171,23 @@ export function infoPartido(c: CruceResuelto, p: PartidoCruce) {
     ronda: RONDA_LABEL[c.ronda],
     /** La Final Anual se presenta sola, sin el rótulo "Fase final". */
     sinFaseFinal: c.ronda === "final_anual",
+    /**
+     * Global del cruce, solo en la vuelta, ordenado como local-visitante de ESTE partido
+     * (en la vuelta el local es el club B). Antes de jugarse la vuelta es el resultado de la ida.
+     */
+    global:
+      p.tipo === "vuelta" && c.golesA !== null && c.golesB !== null
+        ? {
+            local: c.golesB,
+            visita: c.golesA,
+            penales:
+              c.completo &&
+              c.golesA === c.golesB &&
+              c.penales_a !== null &&
+              c.penales_b !== null
+                ? { local: c.penales_b, visita: c.penales_a }
+                : null,
+          }
+        : null,
   };
 }
