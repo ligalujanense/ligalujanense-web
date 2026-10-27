@@ -8,6 +8,7 @@ import {
   type PartidoCruce,
 } from "@/lib/fase-final";
 import { guardarClubesCruce, guardarPartidoCruce, guardarPenalesCruce } from "./actions";
+import { AsignarGoles, type Asignacion, type JugadorPool } from "./AsignarGoles";
 
 const INPUT = "border border-neutral-300 rounded px-2 py-1 text-sm";
 const ORDEN_RONDAS = ["final_anual", "fase1", "fase2", "semifinal", "final"] as const;
@@ -15,9 +16,13 @@ const ORDEN_RONDAS = ["final_anual", "fase1", "fase2", "semifinal", "final"] as 
 export function FaseFinalAdmin({
   cruces,
   clubes,
+  pool,
+  asignaciones,
 }: {
   cruces: CruceResuelto[];
   clubes: ClubFF[];
+  pool: JugadorPool[];
+  asignaciones: Asignacion[];
 }) {
   return (
     <div className="flex flex-col gap-8">
@@ -29,7 +34,7 @@ export function FaseFinalAdmin({
             <h2 className="text-lg font-bold text-celeste-oscuro">{RONDA_LABEL[ronda]}</h2>
             <div className="grid gap-3 lg:grid-cols-2">
               {lista.map((c) => (
-                <CruceAdmin key={c.id} c={c} clubes={clubes} />
+                <CruceAdmin key={c.id} c={c} clubes={clubes} pool={pool} asignaciones={asignaciones} />
               ))}
             </div>
           </section>
@@ -43,7 +48,17 @@ function Aviso({ msg }: { msg: string | null }) {
   return msg ? <span className="text-xs text-red-600">{msg}</span> : null;
 }
 
-function CruceAdmin({ c, clubes }: { c: CruceResuelto; clubes: ClubFF[] }) {
+function CruceAdmin({
+  c,
+  clubes,
+  pool,
+  asignaciones,
+}: {
+  c: CruceResuelto;
+  clubes: ClubFF[];
+  pool: JugadorPool[];
+  asignaciones: Asignacion[];
+}) {
   const nombreA = c.a?.nombre ?? c.etiquetaA;
   const nombreB = c.b?.nombre ?? c.etiquetaB;
   const tipos: PartidoCruce["tipo"][] = c.formato === "unico" ? ["unico"] : ["ida", "vuelta"];
@@ -77,16 +92,26 @@ function CruceAdmin({ c, clubes }: { c: CruceResuelto; clubes: ClubFF[] }) {
 
       {(!c.origen_a || !c.origen_b) && <FormClubes c={c} clubes={clubes} />}
 
-      {tipos.map((tipo) => (
-        <FormPartido
-          key={tipo}
-          c={c}
-          tipo={tipo}
-          partido={c.partidos.find((p) => p.tipo === tipo)}
-          nombreA={nombreA}
-          nombreB={nombreB}
-        />
-      ))}
+      {tipos.map((tipo) => {
+        const partido = c.partidos.find((p) => p.tipo === tipo);
+        return (
+          <div key={tipo} className="flex flex-col gap-2">
+            <FormPartido c={c} tipo={tipo} partido={partido} nombreA={nombreA} nombreB={nombreB} />
+            {partido && c.a && c.b && (
+              <AsignarGoles
+                partidoId={partido.id}
+                clubes={[
+                  { id: c.a.id, nombre: c.a.nombre },
+                  { id: c.b.id, nombre: c.b.nombre },
+                ]}
+                pool={pool}
+                asignados={asignaciones.filter((x) => x.partido_id === partido.id)}
+                golesPorClub={{ [c.a.id]: partido.goles_a, [c.b.id]: partido.goles_b }}
+              />
+            )}
+          </div>
+        );
+      })}
 
       {c.completo && c.golesA === c.golesB && <FormPenales c={c} nombreA={nombreA} nombreB={nombreB} />}
     </div>
