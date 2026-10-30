@@ -223,6 +223,18 @@ function FormPartido({
         </label>
       </div>
       <div className="flex flex-wrap items-end gap-2 text-xs">
+        <label className="flex min-w-[14rem] flex-1 flex-col gap-1">
+          Link de la transmisión (YouTube)
+          <input
+            type="url"
+            name="transmision_url"
+            defaultValue={partido?.transmision_url ?? ""}
+            placeholder="https://www.youtube.com/watch?v=…"
+            className={INPUT}
+          />
+        </label>
+      </div>
+      <div className="flex flex-wrap items-end gap-2 text-xs">
         <label className="flex flex-col gap-1">
           Goles {local}
           <input

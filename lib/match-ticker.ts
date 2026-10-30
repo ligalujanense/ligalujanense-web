@@ -1,5 +1,7 @@
 export type TickerPartido = {
   id: string;
+  /** Transmisión de YouTube en curso: la tarjeta muestra "EN VIVO". */
+  enVivo?: boolean;
   zona: string;
   numeroFecha: number;
   /** Fase final: texto de la tarjeta (ej. "1ª Fase · Ida") en lugar de "Zona · Fecha N". */

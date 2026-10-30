@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/supabase/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { parsearYoutube } from "@/lib/youtube";
 
 function entero(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? "").trim();
@@ -34,12 +35,19 @@ export async function guardarPartidoCruce(
   const fecha = String(formData.get("fecha") ?? "") || null;
   const hora = String(formData.get("hora") ?? "") || null;
   const estadio = String(formData.get("estadio") ?? "").trim() || null;
+  const transmision_url = String(formData.get("transmision_url") ?? "").trim() || null;
+  if (transmision_url && !parsearYoutube(transmision_url)) {
+    return {
+      error:
+        "El link de la transmisión tiene que ser de YouTube (por ejemplo https://www.youtube.com/watch?v=… o https://youtu.be/…)",
+    };
+  }
 
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("fase_final_partidos")
     .upsert(
-      { cruce_id: cruceId, tipo, fecha, hora, estadio, goles_a, goles_b },
+      { cruce_id: cruceId, tipo, fecha, hora, estadio, goles_a, goles_b, transmision_url },
       { onConflict: "cruce_id,tipo" }
     );
   if (error) return { error: error.message };

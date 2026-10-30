@@ -5,6 +5,8 @@ import { cargarPartidoFaseFinal } from "@/lib/fase-final-data";
 import { infoPartido } from "@/lib/fase-final";
 import { diaLargo } from "@/lib/dias";
 import { ShareButtons } from "@/components/site/ShareButtons";
+import { Transmision } from "@/components/site/Transmision";
+import { estadoTransmision } from "@/lib/transmision";
 
 export default async function PartidoFaseFinalPage({
   params,
@@ -30,6 +32,12 @@ export default async function PartidoFaseFinalPage({
         </span>
         {dia && <span className="text-sm text-neutral-500">{dia}</span>}
       </div>
+
+      <Transmision
+        url={partido.transmision_url ?? null}
+        estado={estadoTransmision(partido, !!i.marcador)}
+        titulo={`${i.local.nombre} vs ${i.visita.nombre}`}
+      />
 
       <div className="bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col items-center gap-6 shadow-sm">
         <div className="w-full flex items-center justify-center gap-6 sm:gap-10">

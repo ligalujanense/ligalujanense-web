@@ -19,6 +19,8 @@ export type PartidoCruce = {
   estadio: string | null;
   goles_a: number | null;
   goles_b: number | null;
+  /** Link de YouTube de la transmisión (se muestra como reproductor). */
+  transmision_url?: string | null;
 };
 
 export type Cruce = {

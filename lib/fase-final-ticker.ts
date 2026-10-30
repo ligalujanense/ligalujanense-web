@@ -1,5 +1,7 @@
 import { infoPartido, type CruceResuelto, type PartidoCruce } from "./fase-final";
 import type { TickerPartido } from "./match-ticker";
+import { parsearYoutube } from "./youtube";
+import { estadoTransmision } from "./transmision";
 
 type Item = { dia: string; p: PartidoCruce; c: CruceResuelto };
 
@@ -47,6 +49,9 @@ export function tickerFaseFinal(cruces: CruceResuelto[], hoy: string): TickerPar
       const i = infoPartido(c, p);
       return {
         id: `ff-${p.id}`,
+        enVivo:
+          !!parsearYoutube(p.transmision_url) &&
+          estadoTransmision(p, !!i.marcador) === "envivo",
         zona: "",
         numeroFecha: 0,
         etiqueta: i.tramo ? `${i.ronda} · ${i.tramo}` : i.ronda,

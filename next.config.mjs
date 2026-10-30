@@ -18,6 +18,8 @@ const contentSecurityPolicy = [
   "font-src 'self'",
   "img-src 'self' data: blob: https:",
   `connect-src 'self' ${supabaseOrigin} ${supabaseOrigin.replace("https://", "wss://")}`,
+  // Solo YouTube puede mostrarse adentro de la página (reproductor de la transmisión).
+  "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

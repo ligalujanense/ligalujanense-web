@@ -36,6 +36,12 @@ function MatchCard({ partido }: { partido: TickerPartido }) {
       href={partido.href ?? `/partidos/${partido.id}`}
       className="shrink-0 min-w-[260px] bg-white rounded-lg px-4 py-3 flex flex-col items-center gap-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
     >
+      {partido.enVivo && (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+          En vivo
+        </span>
+      )}
       <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold text-center">
         {partido.etiqueta ?? `${partido.zona} · Fecha ${partido.numeroFecha}`}
         {fechaTexto ? ` · ${fechaTexto}` : ""}
