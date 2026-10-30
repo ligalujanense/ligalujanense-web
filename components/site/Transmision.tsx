@@ -1,4 +1,4 @@
-import { parsearYoutube, urlReproductor } from "@/lib/youtube";
+import { parsearYoutube, urlReproductor, urlVerEnYoutube } from "@/lib/youtube";
 import type { EstadoTransmision } from "@/lib/transmision";
 
 const ETIQUETA: Record<EstadoTransmision, string> = {
@@ -45,6 +45,17 @@ export function Transmision({
           allowFullScreen
         />
       </div>
+      <a
+        href={urlVerEnYoutube(yt)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 self-start rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        Ver en YouTube
+      </a>
     </section>
   );
 }

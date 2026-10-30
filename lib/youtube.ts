@@ -47,6 +47,13 @@ export function parsearYoutube(entrada: string | null | undefined): Youtube | nu
   return candidato && ID_VIDEO.test(candidato) ? { tipo: "video", id: candidato } : null;
 }
 
+/** Dirección para ver la transmisión en YouTube (se arma con el id, no con el link pegado). */
+export function urlVerEnYoutube(y: Youtube): string {
+  return y.tipo === "video"
+    ? `https://www.youtube.com/watch?v=${y.id}`
+    : `https://www.youtube.com/channel/${y.id}/live`;
+}
+
 /** Dirección del reproductor (sin cookies de seguimiento hasta que se reproduce). */
 export function urlReproductor(y: Youtube): string {
   return y.tipo === "video"
